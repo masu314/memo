@@ -3,6 +3,4 @@
     <string name="button_title">Add</string>
     <string name="tv_activity_1">現在画面1です</string>
     <string name="tv_activity_2">現在画面2です</string>
-    <string name="bt_activity_1">画面2へ移動</string>
-    <string name="bt_activity_2">画面1へ移動</string>
 </resources>
