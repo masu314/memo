@@ -22,20 +22,23 @@ public class TaskDBConnect extends AsyncTask<Void, Void, String> {
 
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn= DriverManager.getConnection("jdbc:mysql://localhost:3306/sakila?autoReconnect=true&useSSL=false","root","password");
-            Statement stmt=conn.createStatement();
-            ResultSet rs=stmt.executeQuery("Select * from actor");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/sakila?characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B9:00&rewriteBatchedStatements=true","root","password");
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM actor;");
 
             while(rs.next()){
-                int actor_id = rs.getInt(1);
-                String first_name = rs.getString(2);
-                String last_name = rs.getString(3);
-                String last_update = rs.getString(4);
-                text1 += actor_id + " " + first_name + " " + last_name + " " + last_update + " " + "\r\n";
+                int actor_id = rs.getInt("actor_id");
+                String first_name = rs.getString("first_name");
+                String last_name = rs.getString("last_name");
+                text1 += actor_id + " " + first_name + " " + last_name + " " + " " + "\r\n";
             }
 
+            rs.close();
+            stmt.close();
+            con.close();
+
         }catch(Exception e){
-            text1=e.getMessage();
+            text1 = e.getMessage();
         }
 
         return text1;
