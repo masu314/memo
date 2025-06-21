@@ -1,12 +1,9 @@
 package com.example.memo;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.DriverManager;
+import java.util.List;
 
-import android.widget.TextView;
-import android.os.AsyncTask;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,6 +18,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
+    private DatabaseHelper databaseHelper;
+    private MemoAdapter memoAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,9 +32,15 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Asyncタスククラスのインスタンスを作成し、実行する
-        TaskDBConnect task = new TaskDBConnect(this);
-        task.execute();
+        databaseHelper = new DatabaseHelper(this);
+
+        // データ取得
+        List<Memo> memoList= databaseHelper.getAllMemoList();
+
+        // リストビューにデータ表示
+        memoAdapter = new MemoAdapter(this, memoList);
+        ListView memoListView = findViewById(R.id.memoListView);
+        memoListView.setAdapter(memoAdapter);
     }
 
     //アプリバーにメニューを作成する
