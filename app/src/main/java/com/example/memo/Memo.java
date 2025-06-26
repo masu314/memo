@@ -17,12 +17,12 @@ public class Memo {
         return id;
     }
 
-    //nameを取得するメソッド
+    //titleを取得するメソッド
     public String getTitle() {
         return title;
     }
 
-    //emailを取得するメソッド
+    //contentを取得するメソッド
     public String getContent() {
         return content;
     }
@@ -32,5 +32,14 @@ public class Memo {
         this.id = id;
     }
 
-    //setTitle(),setContent()
+    //titleを更新するメソッド
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    //contentを更新するメソッド
+    public void setContent(String content) {
+        this.content = content;
+    }
+
 }

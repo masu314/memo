@@ -1,9 +1,13 @@
 package com.example.memo;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +17,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "memodatabase.db"; // データベース名
     private static final int DATABASE_VERSION = 1; //データベース更新時にバージョンの値を上げていくこと
     private static final String TABLE_NAME_Memo = "memo"; //生成するテーブル名
-    private static final String USERS_COLUMN_ID = "id"; // テーブル内の属性1
-    private static final String USERS_COLUMN_Title = "title";// テーブル内の属性2
-    private static final String USERS_COLUMN_Content = "content";// テーブル内の属性3
+    private static final String MEMO_COLUMN_ID = "id"; // テーブル内の属性1
+    private static final String MEMO_COLUMN_Title = "title";// テーブル内の属性2
+    private static final String MEMO_COLUMN_Content = "content";// テーブル内の属性3
 
 
     //コンストラクタを定義
@@ -28,9 +32,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTableQuery = "CREATE TABLE " + TABLE_NAME_Memo + " (" +
-                USERS_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                USERS_COLUMN_Title + " TEXT, " +
-                USERS_COLUMN_Content + " TEXT)";
+                MEMO_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                MEMO_COLUMN_Title + " TEXT, " +
+                MEMO_COLUMN_Content + " TEXT)";
         db.execSQL(createTableQuery);
     }
 
@@ -48,14 +52,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME_Memo, null, null, null, null, null, null);
         while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndexOrThrow(USERS_COLUMN_ID));
-            String title = cursor.getString(cursor.getColumnIndexOrThrow(USERS_COLUMN_Title));
-            String content = cursor.getString(cursor.getColumnIndexOrThrow(USERS_COLUMN_Content));
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(MEMO_COLUMN_ID));
+            String title = cursor.getString(cursor.getColumnIndexOrThrow(MEMO_COLUMN_Title));
+            String content = cursor.getString(cursor.getColumnIndexOrThrow(MEMO_COLUMN_Content));
             memoList.add(new Memo(id, title, content));
         }
         cursor.close();
         db.close();
         return memoList;
+    }
+
+    //データを追加するメソッド
+    public void addMemo(EditText titleEditText, EditText contentEditText){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        String title = titleEditText.getText().toString();
+        String content = contentEditText.getText().toString();
+        values.put(MEMO_COLUMN_Title, title);
+        values.put(MEMO_COLUMN_Content, content);
+        db.insert(TABLE_NAME_Memo, null, values);
     }
 
 }

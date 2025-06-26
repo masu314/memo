@@ -29,7 +29,7 @@
         android:textSize="20sp" />
 
     <EditText
-        android:id="@+id/etNote"
+        android:id="@+id/etContent"
         android:layout_width="match_parent"
         android:layout_height="386dp"
         android:layout_weight="0.4"
@@ -40,7 +40,7 @@
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="false"
+        android:enabled="true"
         android:onClick="onSaveButtonClick"
         android:text="@string/btn_save"/>
 
@@ -48,7 +48,7 @@
         android:id="@+id/btnDelete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="false"
+        android:enabled="true"
         android:onClick="onDeleteButtonClick"
         android:text="@string/btn_delete"/>
 

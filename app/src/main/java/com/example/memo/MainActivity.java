@@ -32,12 +32,26 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        databaseHelper = new DatabaseHelper(this);
-
         // データ取得
+        databaseHelper = new DatabaseHelper(this);
         List<Memo> memoList= databaseHelper.getAllMemoList();
 
         // リストビューにデータ表示
+        memoAdapter = new MemoAdapter(this, memoList);
+        ListView memoListView = findViewById(R.id.memoListView);
+        memoListView.setAdapter(memoAdapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // データを再取得して画面を更新
+        loadData();
+    }
+
+    private void loadData() {
+        // データの取得
+        List<Memo> memoList= databaseHelper.getAllMemoList();
         memoAdapter = new MemoAdapter(this, memoList);
         ListView memoListView = findViewById(R.id.memoListView);
         memoListView.setAdapter(memoAdapter);
@@ -55,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
     //メニューボタンを押したときの反応を定義する
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
         if(id == R.id.action_button){
-            Intent intent1 = new Intent(MainActivity.this, MemoAddActivity.class);
-            startActivity(intent1);
+            //登録画面に遷移
+            Intent intent = new Intent(MainActivity.this, MemoAddActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
