@@ -36,9 +36,10 @@ public class MemoAddActivity extends AppCompatActivity {
         });
         titleEditText = findViewById(R.id.etTitle);
         contentEditText = findViewById(R.id.etContent);
-        Button button = findViewById(R.id.btnSave);
-        ButtonListener buttonlistener = new ButtonListener();
-        button.setOnClickListener(buttonlistener);
+        Button saveButton = findViewById(R.id.btnSave);
+        saveButton.setOnClickListener(new ButtonListener());
+        Button deleteButton = findViewById(R.id.btnDelete);
+        deleteButton.setOnClickListener(new ButtonListener());
     }
 
     //アプリバーにメニューを作成する
@@ -57,12 +58,20 @@ public class MemoAddActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //ボタンを押した時の反応を定義
     private class ButtonListener implements View.OnClickListener{
-        //保存ボタンを押したときの反応を定義
         @Override
         public void onClick(View view){
-            DatabaseHelper dbHelper = new DatabaseHelper(activityContext);
-            dbHelper.addMemo(titleEditText, contentEditText);
+            //保存ボタンを押した場合
+            if(view.getId() == R.id.btnSave) {
+                DatabaseHelper dbHelper = new DatabaseHelper(activityContext);
+                dbHelper.addMemo(titleEditText, contentEditText);
+            //削除ボタンを押した場合
+            }else if(view.getId() == R.id.btnDelete){
+
+            }
+            //メイン画面に遷移させる
+            finish();
         }
     }
 }
