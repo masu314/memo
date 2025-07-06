@@ -38,16 +38,13 @@ public class MemoAddActivity extends AppCompatActivity {
         contentEditText = findViewById(R.id.etContent);
         Button saveButton = findViewById(R.id.btnSave);
         saveButton.setOnClickListener(new ButtonListener());
-        Button deleteButton = findViewById(R.id.btnDelete);
-        deleteButton.setOnClickListener(new ButtonListener());
+        Button backButton = findViewById(R.id.btnBack);
+        backButton.setOnClickListener(new ButtonListener());
     }
 
     //アプリバーにメニューを作成する
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //インフレーターを使ってメニューを表示させる
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.add_menu, menu);
         return true;
     }
 
@@ -66,9 +63,6 @@ public class MemoAddActivity extends AppCompatActivity {
             if(view.getId() == R.id.btnSave) {
                 DatabaseHelper dbHelper = new DatabaseHelper(activityContext);
                 dbHelper.addMemo(titleEditText, contentEditText);
-            //削除ボタンを押した場合
-            }else if(view.getId() == R.id.btnDelete){
-
             }
             //メイン画面に遷移させる
             finish();
