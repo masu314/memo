@@ -1,14 +1,17 @@
 package com.example.memo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.SimpleAdapter;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +22,6 @@ import androidx.core.view.WindowInsetsCompat;
 public class MainActivity extends AppCompatActivity {
 
     private DatabaseHelper databaseHelper;
-    private MemoAdapter memoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,15 +33,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        // データ取得
-        databaseHelper = new DatabaseHelper(this);
-        List<Memo> memoList= databaseHelper.getAllMemoList();
-
-        // リストビューにデータ表示
-        memoAdapter = new MemoAdapter(this, memoList);
-        ListView memoListView = findViewById(R.id.memoListView);
-        memoListView.setAdapter(memoAdapter);
+        loadData();
     }
 
     @Override
@@ -49,12 +43,30 @@ public class MainActivity extends AppCompatActivity {
         loadData();
     }
 
+
+    //データの読み込み
     private void loadData() {
         // データの取得
+        databaseHelper = new DatabaseHelper(this);
         List<Memo> memoList= databaseHelper.getAllMemoList();
-        memoAdapter = new MemoAdapter(this, memoList);
-        ListView memoListView = findViewById(R.id.memoListView);
-        memoListView.setAdapter(memoAdapter);
+
+        ArrayList<Map<String, Object>> listData = new ArrayList<>();
+        for (int i=0; i < memoList.size(); i++) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("title", memoList.get(i).getTitle());
+            item.put("content", memoList.get(i).getContent());
+            listData.add(item);
+        }
+
+        // リストビューにデータを設定
+        ListView list = findViewById(R.id.memoListView);
+        list.setAdapter(new SimpleAdapter(
+                this,
+                listData,
+                R.layout.list_item,
+                new String[] {"title", "content"},
+                new int[] {R.id.title, R.id.content}
+        ));
     }
 
     //アプリバーにメニューを作成する
