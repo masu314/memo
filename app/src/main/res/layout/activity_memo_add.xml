@@ -41,7 +41,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:enabled="true"
-        android:onClick="onSaveButtonClick"
         android:text="@string/btn_save"/>
 
     <Button
@@ -49,7 +48,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:enabled="true"
-        android:onClick="onBackButtonClick"
         android:text="@string/btn_back"/>
 
 </LinearLayout>

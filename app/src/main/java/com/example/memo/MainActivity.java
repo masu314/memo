@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.content.Context;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,6 +26,10 @@ import androidx.core.view.WindowInsetsCompat;
 public class MainActivity extends AppCompatActivity {
 
     private DatabaseHelper databaseHelper;
+    public static Map<String, String> data;
+    public static List<Map<String, String>> dataList;
+    public static ListView listView;
+    public static ListViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,23 +58,29 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         List<Memo> memoList= databaseHelper.getAllMemoList();
 
-        ArrayList<Map<String, Object>> listData = new ArrayList<>();
+        // アダプターにデータを渡せるように,map型のListを作成
+        dataList = new ArrayList<Map<String, String>>();
         for (int i=0; i < memoList.size(); i++) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("title", memoList.get(i).getTitle());
-            item.put("content", memoList.get(i).getContent());
-            listData.add(item);
+            Map<String, String> data = new HashMap<String, String>();
+            data.put("title", memoList.get(i).getTitle());
+            data.put("content", memoList.get(i).getContent());
+            dataList.add(data);
         }
 
-        // リストビューにデータを設定
-        ListView list = findViewById(R.id.memoListView);
-        list.setAdapter(new SimpleAdapter(
+        //アダプターにデータを渡す
+        adapter = new ListViewAdapter(
                 this,
-                listData,
+                dataList,
                 R.layout.list_item,
                 new String[] {"title", "content"},
                 new int[] {R.id.title, R.id.content}
-        ));
+        );
+
+        // ListViewにアダプターを設定する
+        listView = (ListView) findViewById(R.id.memoListView);
+        listView.setAdapter(adapter);
+        listView.setTextFilterEnabled(false);
+
     }
 
     //アプリバーにメニューを作成する
