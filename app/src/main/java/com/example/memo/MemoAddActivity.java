@@ -20,9 +20,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MemoAddActivity extends AppCompatActivity {
 
-    EditText titleEditText;
-    EditText contentEditText;
-    Context activityContext = this;
+    private EditText titleEditText;
+    private EditText contentEditText;
+    private Context activityContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

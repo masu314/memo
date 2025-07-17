@@ -45,18 +45,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // データを再取得して画面を更新
+        // データを読み込み
         loadData();
     }
 
 
     //データの読み込み
     private void loadData() {
-        // データの取得
+        // 登録されているメモ一覧を取得
         dbHelper = new DatabaseHelper(this);
         memoList = dbHelper.getAllMemoList();
 
-        // アダプターにデータを渡す
+        // アダプターにメモ一覧を渡す
         adapter = new ListViewAdapter(this, memoList);
 
         // ListViewにアダプターを設定する
@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        // +ボタンが押された場合
         if(id == R.id.action_button){
             //登録画面に遷移
             Intent intent = new Intent(MainActivity.this, MemoAddActivity.class);
