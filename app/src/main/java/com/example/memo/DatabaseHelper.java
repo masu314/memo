@@ -47,8 +47,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //データベースからすべてのユーザーを取得するメソッド
-    public List<Memo> getAllMemoList() {
-        List<Memo> memoList = new ArrayList<>();
+    public ArrayList<Memo> getAllMemoList() {
+        ArrayList<Memo> memoList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME_Memo, null, null, null, null, null, null);
         while (cursor.moveToNext()) {
@@ -73,4 +73,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME_Memo, null, values);
     }
 
+    //データを削除するメソッド
+    public void deleteMemo(int id){
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME_Memo, MEMO_COLUMN_ID + " = ?", new String[] { String.valueOf(id)});
+        db.close();
+    }
 }

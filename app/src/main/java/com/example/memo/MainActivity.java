@@ -25,11 +25,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private DatabaseHelper databaseHelper;
-    public static Map<String, String> data;
-    public static List<Map<String, String>> dataList;
-    public static ListView listView;
-    public static ListViewAdapter adapter;
+    private DatabaseHelper dbHelper;
+    private ListView listView;
+    private ListViewAdapter adapter;
+    private ArrayList<Memo> memoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        loadData();
     }
 
     @Override
@@ -55,31 +53,29 @@ public class MainActivity extends AppCompatActivity {
     //データの読み込み
     private void loadData() {
         // データの取得
-        databaseHelper = new DatabaseHelper(this);
-        List<Memo> memoList= databaseHelper.getAllMemoList();
+        dbHelper = new DatabaseHelper(this);
+        memoList = dbHelper.getAllMemoList();
 
-        // アダプターにデータを渡せるように,map型のListを作成
-        dataList = new ArrayList<Map<String, String>>();
-        for (int i=0; i < memoList.size(); i++) {
-            Map<String, String> data = new HashMap<String, String>();
-            data.put("title", memoList.get(i).getTitle());
-            data.put("content", memoList.get(i).getContent());
-            dataList.add(data);
-        }
-
-        //アダプターにデータを渡す
-        adapter = new ListViewAdapter(
-                this,
-                dataList,
-                R.layout.list_item,
-                new String[] {"title", "content"},
-                new int[] {R.id.title, R.id.content}
-        );
+        // アダプターにデータを渡す
+        adapter = new ListViewAdapter(this, memoList);
 
         // ListViewにアダプターを設定する
         listView = (ListView) findViewById(R.id.memoListView);
         listView.setAdapter(adapter);
-        listView.setTextFilterEnabled(false);
+
+        // 削除ボタンが押されたことがアダプターから通知されたときの処理
+        adapter.setOnDeleteClickListener(new ListViewAdapter.OnDeleteClickListener() {
+            @Override
+            public void onDeleteClick(Memo memo) {
+                // DBから削除
+                dbHelper.deleteMemo(memo.getId());
+                memoList.clear();
+                //最新データ取得
+                memoList.addAll(dbHelper.getAllMemoList());
+                //画面更新
+                adapter.notifyDataSetChanged();
+            }
+        });
 
     }
 
