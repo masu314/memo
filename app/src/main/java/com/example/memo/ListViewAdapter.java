@@ -21,19 +21,26 @@ public class ListViewAdapter extends BaseAdapter {
     private ArrayList<Memo> memoList;
     private LayoutInflater inflater;
     private Context context;
-    private OnDeleteClickListener listener;
+    private OnDeleteClickListener deleteListener;
+    private OnEditClickListener editListener;
 
     // リスナーのインターフェースを定義
     public interface  OnDeleteClickListener {
         void onDeleteClick(Memo memo);
     }
+    public interface  OnEditClickListener {
+        void onEditClick(Memo memo);
+    }
 
     // リスナーをセット
     public void setOnDeleteClickListener(OnDeleteClickListener listener){
-        this.listener = listener;
+        this.deleteListener = listener;
+    }
+    public void setOnEditClickListener(OnEditClickListener listener){
+        this.editListener = listener;
     }
 
-
+    // 初期化
     public ListViewAdapter(Context context, ArrayList<Memo> memoList) {
         this.memoList = memoList;
         this.inflater = LayoutInflater.from(context);
@@ -63,7 +70,7 @@ public class ListViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         Memo memo = memoList.get(position);
 
-        //ビューが再利用可能でない場合（新しくビューを作成する必要がある場合）
+        // ビューが再利用可能でない場合（新しくビューを作成する必要がある場合）
         if (convertView == null) {
             //レイアウトのビューをインフレート
             convertView = inflater.inflate(R.layout.list_item, null);
@@ -78,15 +85,27 @@ public class ListViewAdapter extends BaseAdapter {
         content.setText(memo.getContent());
 
         // ボタンビューを取得
-        Button btn = (Button) convertView.findViewById(R.id.btnDelete);
+        Button btnDelete = (Button) convertView.findViewById(R.id.btnDelete);
+        Button btnEdit = (Button) convertView.findViewById(R.id.btnEdit);
 
-        // ボタンがクリックされたときの処理を定義
-        btn.setOnClickListener(new View.OnClickListener() {
+        // 削除ボタンがクリックされたときの処理を定義
+        btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                if(listener != null){
+                if(deleteListener != null){
                     // Activityに通知
-                    listener.onDeleteClick(memo);
+                    deleteListener.onDeleteClick(memo);
+                }
+            }
+        });
+
+        // 編集ボタンがクリックされたときの処理を定義
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                if(editListener != null){
+                    // Activityに通知
+                    editListener.onEditClick(memo);
                 }
             }
         });

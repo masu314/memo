@@ -77,6 +77,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 編集ボタンが押されたことがアダプターから通知されたときの処理
+        adapter.setOnEditClickListener(new ListViewAdapter.OnEditClickListener() {
+            @Override
+            public void onEditClick(Memo memo) {
+                Log.d("MainActivity", "editが押されました");
+            }
+        });
+
     }
 
     //アプリバーにメニューを作成する
