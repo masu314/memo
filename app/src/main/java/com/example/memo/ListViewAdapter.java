@@ -21,24 +21,6 @@ public class ListViewAdapter extends BaseAdapter {
     private ArrayList<Memo> memoList;
     private LayoutInflater inflater;
     private Context context;
-    private OnDeleteClickListener deleteListener;
-    private OnEditClickListener editListener;
-
-    // リスナーのインターフェースを定義
-    public interface  OnDeleteClickListener {
-        void onDeleteClick(Memo memo);
-    }
-    public interface  OnEditClickListener {
-        void onEditClick(Memo memo);
-    }
-
-    // リスナーをセット
-    public void setOnDeleteClickListener(OnDeleteClickListener listener){
-        this.deleteListener = listener;
-    }
-    public void setOnEditClickListener(OnEditClickListener listener){
-        this.editListener = listener;
-    }
 
     // 初期化
     public ListViewAdapter(Context context, ArrayList<Memo> memoList) {
@@ -83,32 +65,6 @@ public class ListViewAdapter extends BaseAdapter {
         // データ取得してビューにバインドする
         title.setText(memo.getTitle());
         content.setText(memo.getContent());
-
-        // ボタンビューを取得
-        Button btnDelete = (Button) convertView.findViewById(R.id.btnDelete);
-        Button btnEdit = (Button) convertView.findViewById(R.id.btnEdit);
-
-        // 削除ボタンがクリックされたときの処理を定義
-        btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                if(deleteListener != null){
-                    // Activityに通知
-                    deleteListener.onDeleteClick(memo);
-                }
-            }
-        });
-
-        // 編集ボタンがクリックされたときの処理を定義
-        btnEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                if(editListener != null){
-                    // Activityに通知
-                    editListener.onEditClick(memo);
-                }
-            }
-        });
 
         return convertView;
     }

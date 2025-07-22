@@ -34,8 +34,8 @@ public class MemoAddActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        titleEditText = findViewById(R.id.etTitle);
-        contentEditText = findViewById(R.id.etContent);
+        titleEditText = findViewById(R.id.addTitle);
+        contentEditText = findViewById(R.id.addContent);
         Button saveButton = findViewById(R.id.btnSave);
         saveButton.setOnClickListener(new ButtonListener());
         Button backButton = findViewById(R.id.btnBack);

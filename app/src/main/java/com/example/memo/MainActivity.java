@@ -8,6 +8,7 @@ import java.util.Map;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.content.Intent;
@@ -63,28 +64,22 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.memoListView);
         listView.setAdapter(adapter);
 
-        // 削除ボタンが押されたことがアダプターから通知されたときの処理
-        adapter.setOnDeleteClickListener(new ListViewAdapter.OnDeleteClickListener() {
+        // リスト項目がクリックされたときの処理
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onDeleteClick(Memo memo) {
-                // DBから削除
-                dbHelper.deleteMemo(memo.getId());
-                memoList.clear();
-                //最新データ取得
-                memoList.addAll(dbHelper.getAllMemoList());
-                //画面更新
-                adapter.notifyDataSetChanged();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // 選択されたリストのデータを取得
+                Memo memo = memoList.get(position);
+                // DetailActivityに遷移する準備
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                // intentにメモのデータを渡す
+                intent.putExtra("memo_id", memo.getId());
+                intent.putExtra("memo_title", memo.getTitle());
+                intent.putExtra("memo_content", memo.getContent());
+                // DetailActivityを起動
+                startActivity(intent);
             }
         });
-
-        // 編集ボタンが押されたことがアダプターから通知されたときの処理
-        adapter.setOnEditClickListener(new ListViewAdapter.OnEditClickListener() {
-            @Override
-            public void onEditClick(Memo memo) {
-                Log.d("MainActivity", "editが押されました");
-            }
-        });
-
     }
 
     //アプリバーにメニューを作成する
