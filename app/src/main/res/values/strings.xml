@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">メモ帳アプリ</string>
+    <string name="app_name">メモ</string>
     <string name="button_title">Add</string>
     <string name="tv_lb_name">タイトル:</string>
     <string name="tv_lb_note">内容:</string>
