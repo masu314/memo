@@ -62,7 +62,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return memoList;
     }
 
-    //データを追加するメソッド
+    //メモを追加するメソッド
     public void addMemo(EditText titleEditText, EditText contentEditText){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -73,10 +73,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME_Memo, null, values);
     }
 
+    // メモを更新するメソッド（IDで指定）
+    public void updateMemo(int id, String newTitle, String newContent) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(MEMO_COLUMN_Title, newTitle);
+        values.put(MEMO_COLUMN_Content, newContent);
+        db.update(TABLE_NAME_Memo, values, MEMO_COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
     //データを削除するメソッド
     public void deleteMemo(int id){
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_NAME_Memo, MEMO_COLUMN_ID + " = ?", new String[] { String.valueOf(id)});
         db.close();
     }
+
+
 }

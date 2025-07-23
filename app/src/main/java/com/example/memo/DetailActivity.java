@@ -1,7 +1,9 @@
 package com.example.memo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -54,6 +56,15 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            // DB保存処理
+            EditText titleEditText = findViewById(R.id.etTitle);
+            EditText contentEditText = findViewById(R.id.etContent);
+            String updatedTitle = titleEditText.getText().toString();
+            String updatedContent = contentEditText.getText().toString();
+            if (memoId != -1 && !updatedTitle.isEmpty()) {
+                DatabaseHelper dbHelper = new DatabaseHelper(this);
+                dbHelper.updateMemo(memoId, updatedTitle, updatedContent);
+            }
             finish(); // この画面を閉じて前の画面に戻る
             return true;
         }
