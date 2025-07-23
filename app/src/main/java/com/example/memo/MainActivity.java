@@ -1,22 +1,15 @@
 package com.example.memo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.SimpleAdapter;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -82,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //アプリバーにメニューを作成する
+    //アプリバーにメニューを作成
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //インフレーターを使ってメニューを表示させる
@@ -91,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    //メニューボタンを押したときの反応を定義する
+    //メニューボタンを押したときの反応を定義
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
