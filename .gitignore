@@ -1,16 +1,41 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# OS関連
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+Thumbs.db
+
+# Android Studio関連
 .idea/
+*.iml
+.gradle/
+local.properties
+
+# ビルド結果
+/build/
+/app/build/
+
+# キャッシュ・ログ
+*.log
+
+# Androidパッケージ関連
+*.apk
+*.ap_
+
+# 自動生成ファイル・フォルダ
+/captures/
+/output.json
+
+# テスト結果やレポート
+test-output/
+
+# 環境変数ファイル（APIキーなど機密情報）
+.env
+.env.*
+
+# Node.js関連（もし使っていたら）
+node_modules/
+
+# Kotlin関連（キャッシュなど）
+.kotlinc/
+
+# IntelliJやJetBrains系エディター関連（補足）
+*.iws
+.idea_modules/
