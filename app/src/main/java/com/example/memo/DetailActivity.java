@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -57,6 +60,14 @@ public class DetailActivity extends AppCompatActivity {
         firebaseHelper = new FirebaseHelper();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //インフレーターを使ってメニューを表示させる
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.detail_menu, menu);
+        return true;
+    }
+
     // アクションバーのボタンを押したときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -75,6 +86,10 @@ public class DetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "メモ情報の取得に失敗しました", Toast.LENGTH_SHORT).show();
             }
             finish(); // この画面を閉じて前の画面に戻る
+            return true;
+        }else if (item.getItemId() == R.id.delete_button) {
+            firebaseHelper.deleteMemo(id);
+            finish();
             return true;
         }
         // 他のボタンに対してはデフォルトの処理を実行

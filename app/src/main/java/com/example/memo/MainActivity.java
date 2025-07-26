@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 // アダプターにメモ一覧を渡す
                 adapter = new ListViewAdapter(MainActivity.this, memoList);
                 // ListViewにアダプターを設定する
-                listView = (ListView) findViewById(R.id.memoListView);
+                listView = (ListView) findViewById(R.id.memoList);
                 listView.setAdapter(adapter);
 
                 // リスト項目がクリックされたときの処理
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         //インフレーターを使ってメニューを表示させる
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.add_menu, menu);
+        inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         // +ボタンが押された場合
-        if(id == R.id.action_button){
+        if(id == R.id.add_button){
             // 登録画面に遷移
             Intent intent = new Intent(MainActivity.this, MemoAddActivity.class);
             startActivity(intent);

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">メモ</string>
-    <string name="button_title">Add</string>
+    <string name="add_button_title">Add</string>
+    <string name="delete_button_title">Delete</string>
     <string name="tv_lb_name">タイトル:</string>
     <string name="tv_lb_note">内容:</string>
     <string name="btn_save">保存</string>
