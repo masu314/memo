@@ -18,7 +18,7 @@
             android:name=".DetailActivity"
             android:exported="false" />
         <activity
-            android:name=".MemoAddActivity"
+            android:name=".AddActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

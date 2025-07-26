@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         // +ボタンが押された場合
         if(id == R.id.add_button){
             // 登録画面に遷移
-            Intent intent = new Intent(MainActivity.this, MemoAddActivity.class);
+            Intent intent = new Intent(MainActivity.this, AddActivity.class);
             startActivity(intent);
         }
         // 他のボタンに対してはデフォルトの処理を実行
