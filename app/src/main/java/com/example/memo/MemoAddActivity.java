@@ -18,11 +18,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MemoAddActivity extends AppCompatActivity {
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-    private EditText titleEditText;
-    private EditText contentEditText;
-    private Context activityContext = this;
+public class MemoAddActivity extends AppCompatActivity {
+    private FirebaseHelper firebaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,37 +34,37 @@ public class MemoAddActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        titleEditText = findViewById(R.id.addTitle);
-        contentEditText = findViewById(R.id.addContent);
+
+        // ボタンにリスナーを設定
         Button saveButton = findViewById(R.id.btnSave);
         saveButton.setOnClickListener(new ButtonListener());
         Button backButton = findViewById(R.id.btnBack);
         backButton.setOnClickListener(new ButtonListener());
+
+        // FirebaseHelperをインスタンス化
+        firebaseHelper = new FirebaseHelper();
     }
 
-    //アプリバーにメニューを作成する
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
-    }
-
-    //メニューボタンを押したときの反応を定義
+    // メニューボタンを押したときの反応を定義
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         finish();
         return super.onOptionsItemSelected(item);
     }
 
-    //ボタンを押した時の反応を定義
+    // ボタンを押した時の処理
     private class ButtonListener implements View.OnClickListener{
         @Override
         public void onClick(View view){
-            //保存ボタンを押した場合
+            // 保存ボタンを押した場合
             if(view.getId() == R.id.btnSave) {
-                DatabaseHelper dbHelper = new DatabaseHelper(activityContext);
-                dbHelper.addMemo(titleEditText, contentEditText);
+                // 入力した文字列を取得
+                String inputTitle = ((EditText)findViewById(R.id.addTitle)).getText().toString();
+                String inputContent = ((EditText)findViewById(R.id.addContent)).getText().toString();
+                // データを保存
+                firebaseHelper.addMemo(inputTitle,inputContent);
             }
-            //メイン画面に遷移させる
+            // メイン画面に遷移させる
             finish();
         }
     }

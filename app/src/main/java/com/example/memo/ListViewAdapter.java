@@ -41,10 +41,10 @@ public class ListViewAdapter extends BaseAdapter {
         return memoList.get(position);
     }
 
-    // データのIDを取得
+    // ListViewの内部処理用
     @Override
     public long getItemId(int position){
-        return memoList.get(position).getId();
+        return position;
     }
 
     // 各行のレイアウトを生成して取得
@@ -54,7 +54,7 @@ public class ListViewAdapter extends BaseAdapter {
 
         // ビューが再利用可能でない場合（新しくビューを作成する必要がある場合）
         if (convertView == null) {
-            //レイアウトのビューをインフレート
+            // レイアウトのビューをインフレート
             convertView = inflater.inflate(R.layout.list_item, null);
         }
 

@@ -2,42 +2,45 @@ package com.example.memo;
 
 public class Memo {
 
-    private int id;
+    private String id;
     private String title;
     private String content;
 
-    public Memo(int id, String title, String content) {
+    // Firebaseがデータ取得時に必要とする空のコンストラクタ
+    public Memo() {}
+
+    public Memo(String id, String title, String content) {
         this.id = id;
         this.title = title;
         this.content = content;
     }
 
-    //idを取得するメソッド
-    public int getId() {
+    // idを取得するメソッド
+    public String getId() {
         return id;
     }
 
-    //titleを取得するメソッド
+    // titleを取得するメソッド
     public String getTitle() {
         return title;
     }
 
-    //contentを取得するメソッド
+    // contentを取得するメソッド
     public String getContent() {
         return content;
     }
 
-    //idを更新するメソッド
-    public void setId(int id) {
+    // idを更新するメソッド
+    public void setId(String id) {
         this.id = id;
     }
 
-    //titleを更新するメソッド
+    // titleを更新するメソッド
     public void setTitle(String title) {
         this.title = title;
     }
 
-    //contentを更新するメソッド
+    // contentを更新するメソッド
     public void setContent(String content) {
         this.content = content;
     }
