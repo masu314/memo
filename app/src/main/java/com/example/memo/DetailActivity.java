@@ -44,13 +44,13 @@ public class DetailActivity extends AppCompatActivity {
 
         // タイトルと内容のEditTextビューを取得
         titleView = findViewById(R.id.etTitle);
-        contentView = findViewById(R.id.etContent);
+        contentView = findViewById(R.id.etNote);
 
         // メイン画面から渡されたIntentからメモの情報を取得
         Intent intent = getIntent();
         id = intent.getStringExtra("memo_id");
         String title = intent.getStringExtra("memo_title");
-        String content = intent.getStringExtra("memo_content");
+        String content = intent.getStringExtra("memo_note");
 
         // 既存のメモの情報をビューにバインドする
         titleView.setText(title);
@@ -75,11 +75,11 @@ public class DetailActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             // 入力した文字列を取得
             String inputTitle = ((EditText)findViewById(R.id.etTitle)).getText().toString();
-            String inputContent = ((EditText)findViewById(R.id.etContent)).getText().toString();
+            String inputNote = ((EditText)findViewById(R.id.etNote)).getText().toString();
             // 既存のデータがあり、タイトルが空ではない場合
             if (id != null && !inputTitle.isEmpty()) {
                 //データを更新
-                firebaseHelper.updateMemo(id, inputTitle, inputContent);
+                firebaseHelper.updateMemo(id, inputTitle, inputNote);
             // データがない場合
             } else if (id == null){
                 Log.e("DetailActivity", "メモIDが無効です");

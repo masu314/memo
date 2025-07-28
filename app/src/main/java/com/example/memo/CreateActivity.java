@@ -12,14 +12,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class AddActivity extends AppCompatActivity {
+public class CreateActivity extends AppCompatActivity {
     private FirebaseHelper firebaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_add);
+        setContentView(R.layout.activity_create);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -51,9 +51,9 @@ public class AddActivity extends AppCompatActivity {
             if(view.getId() == R.id.btnSave) {
                 // 入力した文字列を取得
                 String inputTitle = ((EditText)findViewById(R.id.addTitle)).getText().toString();
-                String inputContent = ((EditText)findViewById(R.id.addContent)).getText().toString();
+                String inputNote = ((EditText)findViewById(R.id.addNote)).getText().toString();
                 // データを保存
-                firebaseHelper.addMemo(inputTitle,inputContent);
+                firebaseHelper.insertMemo(inputTitle,inputNote);
             }
             // メイン画面に遷移させる
             finish();

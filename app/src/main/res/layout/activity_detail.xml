@@ -28,7 +28,7 @@
         android:textSize="20sp" />
 
     <EditText
-        android:id="@+id/etContent"
+        android:id="@+id/etNote"
         android:layout_width="match_parent"
         android:layout_height="386dp"
         android:layout_weight="0.4"

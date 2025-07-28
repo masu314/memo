@@ -3,9 +3,11 @@ package com.example.memo;
 import android.util.Log;
 import androidx.annotation.NonNull;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,23 +20,29 @@ public class FirebaseHelper {
         databaseRef = database.getReference("memos");
     }
 
-    // メモ追加（pushでID自動生成）
-    public void addMemo(String title, String content) {
+    // 新規メモの作成（pushでID自動生成）
+    public void insertMemo(String title, String note) {
         // 新しい一意のキーを生成
         String id = databaseRef.push().getKey();
-        Memo memo = new Memo(id, title, content);
+        // 新規作成内容を取得
+        Map<String, Object> inserts = new HashMap<>();
+        inserts.put("id", id);
+        inserts.put("title", title);
+        inserts.put("note", note);
+        inserts.put("updatedAt", ServerValue.TIMESTAMP); // サーバー側の現在時刻
         // データを保存
-        databaseRef.child(id).setValue(memo);
+        databaseRef.child(id).setValue(inserts);
     }
 
     // メモ更新（ID指定で上書き）
-    public void updateMemo(String id, String newTitle, String newContent) {
+    public void updateMemo(String id, String newTitle, String newNote) {
         // 指定のidのノードだけ取得
         DatabaseReference memoRef = databaseRef.child(id);
         // 更新内容を取得
         Map<String, Object> updates = new HashMap<>();
         updates.put("title", newTitle);
-        updates.put("content", newContent);
+        updates.put("content", newNote);
+        updates.put("updatedAt", ServerValue.TIMESTAMP); // サーバー側の現在時刻
         // データを更新
         memoRef.updateChildren(updates);
     }

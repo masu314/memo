@@ -11,9 +11,12 @@ import android.widget.Button;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ListViewAdapter extends BaseAdapter {
@@ -60,11 +63,23 @@ public class ListViewAdapter extends BaseAdapter {
 
         // テキストビューを取得
         TextView title = convertView.findViewById(R.id.title);
-        TextView content = convertView.findViewById(R.id.content);
+        TextView note = convertView.findViewById(R.id.note);
+        TextView updatedAt = convertView.findViewById(R.id.updatedAt);
 
         // データ取得してビューにバインドする
         title.setText(memo.getTitle());
-        content.setText(memo.getContent());
+        note.setText(memo.getNote());
+
+        // 更新日時をDate型に変換
+        Date date = memo.getUpdatedAtDate();
+        // formatUpdatedAtで条件分岐させ、フォーマットを指定し、String型に格納
+        String formattedDate = DateUtils.formatUpdatedAt(date);
+        // 更新日時をビューにバインド
+        if (formattedDate != null) {
+            updatedAt.setText(formattedDate);
+        } else {
+            updatedAt.setText("");
+        }
 
         return convertView;
     }
