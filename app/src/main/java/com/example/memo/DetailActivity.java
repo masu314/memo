@@ -19,10 +19,13 @@ import androidx.core.view.WindowInsetsCompat;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 public class DetailActivity extends AppCompatActivity {
 
     private String id;
-    private TextView titleView, contentView;
+    private EditText titleEditView, noteEditView;
+    private String originalTitle,originalNote;
     private FirebaseHelper firebaseHelper;
 
     @Override
@@ -39,22 +42,22 @@ public class DetailActivity extends AppCompatActivity {
         // アクションバーを取得
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true); // 戻るボタンを表示
+            // 戻るボタンを表示
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
         // タイトルと内容のEditTextビューを取得
-        titleView = findViewById(R.id.etTitle);
-        contentView = findViewById(R.id.etNote);
+        titleEditView = findViewById(R.id.etTitle);
+        noteEditView = findViewById(R.id.etNote);
 
         // メイン画面から渡されたIntentからメモの情報を取得
         Intent intent = getIntent();
         id = intent.getStringExtra("memo_id");
-        String title = intent.getStringExtra("memo_title");
-        String content = intent.getStringExtra("memo_note");
+        originalTitle = intent.getStringExtra("memo_title");
+        originalNote = intent.getStringExtra("memo_note");
 
         // 既存のメモの情報をビューにバインドする
-        titleView.setText(title);
-        contentView.setText(content);
+        titleEditView.setText(originalTitle);
+        noteEditView.setText(originalNote);
 
         // FirebaseHelperをインスタンス化
         firebaseHelper = new FirebaseHelper();
@@ -68,31 +71,47 @@ public class DetailActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // 現在フォームに表示されている情報を取得
+        String currentTitle = titleEditView.getText().toString();
+        String currentNote = noteEditView.getText().toString();
+
+        // データがあり、内容が変更されている場合
+        if (id != null && (!Objects.equals(currentTitle, originalTitle) || !Objects.equals(currentNote, originalNote))) {
+            // タイトルが空の場合
+            if(currentTitle.isEmpty()){
+                Toast.makeText(this, "タイトルが空だと保存できません", Toast.LENGTH_SHORT).show();
+            } else {
+                // メモの内容を更新
+                firebaseHelper.updateMemo(id, currentTitle, currentNote);
+            }
+        // データがない場合
+        } else if (id == null){
+            Log.e("DetailActivity", "メモIDが無効です");
+            Toast.makeText(this, "メモ情報の取得に失敗しました", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     // アクションバーのボタンを押したときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //戻るボタンを押したときの処理
+        // 戻るボタンを押したときの処理
         if (item.getItemId() == android.R.id.home) {
-            // 入力した文字列を取得
-            String inputTitle = ((EditText)findViewById(R.id.etTitle)).getText().toString();
-            String inputNote = ((EditText)findViewById(R.id.etNote)).getText().toString();
-            // 既存のデータがあり、タイトルが空ではない場合
-            if (id != null && !inputTitle.isEmpty()) {
-                //データを更新
-                firebaseHelper.updateMemo(id, inputTitle, inputNote);
-            // データがない場合
-            } else if (id == null){
-                Log.e("DetailActivity", "メモIDが無効です");
-                Toast.makeText(this, "メモ情報の取得に失敗しました", Toast.LENGTH_SHORT).show();
-            }
-            finish(); // この画面を閉じて前の画面に戻る
-            return true;
-        }else if (item.getItemId() == R.id.delete_button) {
-            firebaseHelper.deleteMemo(id);
+            // メイン画面に遷移
             finish();
             return true;
+        // ゴミ箱アイコンを押したときの処理
+        } else if (item.getItemId() == R.id.delete_button) {
+            // メモを削除
+            firebaseHelper.deleteMemo(id);
+            // メイン画面に遷移
+            finish();
+            return true;
+        } else {
+            // デフォルトの処理を実行
+            return super.onOptionsItemSelected(item);
         }
-        // 他のボタンに対してはデフォルトの処理を実行
-        return super.onOptionsItemSelected(item);
     }
 }
