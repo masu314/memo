@@ -38,12 +38,7 @@ public class DateUtils {
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE HH:mm", Locale.JAPAN); // "水曜日 15:30"
             sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo")); // ← 日本時間に変換
             return sdf.format(updatedAt);
-        // 同じ年の場合
-        } else if (calNow.get(Calendar.YEAR) == calUpdated.get(Calendar.YEAR)) {
-            SimpleDateFormat sdf = new SimpleDateFormat("M月d日", Locale.JAPAN);
-            sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo")); // ← 日本時間に変換
-            return sdf.format(updatedAt);
-        // 年が異なる場合
+        // それ以外の場合
         } else {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.JAPAN);
             sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo")); // ← 日本時間に変換
