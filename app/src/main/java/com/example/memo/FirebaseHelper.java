@@ -41,7 +41,7 @@ public class FirebaseHelper {
         // 更新内容を取得
         Map<String, Object> updates = new HashMap<>();
         updates.put("title", newTitle);
-        updates.put("content", newNote);
+        updates.put("note", newNote);
         updates.put("updatedAt", ServerValue.TIMESTAMP); // サーバー側の現在時刻
         // データを更新
         memoRef.updateChildren(updates);
