@@ -1,19 +1,27 @@
 package com.example.memo;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.Objects;
+
 public class CreateActivity extends AppCompatActivity {
     private FirebaseHelper firebaseHelper;
+    private EditText titleEditView, noteEditView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,37 +34,48 @@ public class CreateActivity extends AppCompatActivity {
             return insets;
         });
 
-        // ボタンにリスナーを設定
-        Button saveButton = findViewById(R.id.btnSave);
-        saveButton.setOnClickListener(new ButtonListener());
-        Button backButton = findViewById(R.id.btnBack);
-        backButton.setOnClickListener(new ButtonListener());
+        // タイトルと内容のEditTextビューを取得
+        titleEditView = findViewById(R.id.ipTitle);
+        noteEditView = findViewById(R.id.ipNote);
 
         // FirebaseHelperをインスタンス化
         firebaseHelper = new FirebaseHelper();
+
+        // アクションバーを取得
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // 戻るボタンを表示
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
-    // メニューボタンを押したときの反応を定義
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // 現在フォームに表示されている情報を取得
+        String inputTitle = titleEditView.getText().toString();
+        String inputNote = noteEditView.getText().toString();
+
+        // タイトルが空の場合
+        if(inputTitle.isEmpty()){
+            Toast.makeText(this, "タイトルが空だと保存できません", Toast.LENGTH_SHORT).show();
+        } else {
+            // メモの内容を保存
+            firebaseHelper.insertMemo(inputTitle, inputNote);
+        }
+    }
+
+    // アクションバーのボタンを押したときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        finish();
-        return super.onOptionsItemSelected(item);
-    }
-
-    // ボタンを押した時の処理
-    private class ButtonListener implements View.OnClickListener{
-        @Override
-        public void onClick(View view){
-            // 保存ボタンを押した場合
-            if(view.getId() == R.id.btnSave) {
-                // 入力した文字列を取得
-                String inputTitle = ((EditText)findViewById(R.id.addTitle)).getText().toString();
-                String inputNote = ((EditText)findViewById(R.id.addNote)).getText().toString();
-                // データを保存
-                firebaseHelper.insertMemo(inputTitle,inputNote);
-            }
-            // メイン画面に遷移させる
+        // 戻るボタンを押したときの処理
+        if (item.getItemId() == android.R.id.home) {
+            // メイン画面に遷移
             finish();
+            return true;
+        } else {
+            // デフォルトの処理を実行
+            return super.onOptionsItemSelected(item);
         }
     }
 }
