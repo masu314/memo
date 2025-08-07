@@ -77,8 +77,9 @@ public class MainActivity extends AppCompatActivity {
 
     // データの読み込み
     private void loadData() {
-        // 登録されているメモ一覧を全件取得
+        // 登録されているメモ一覧を全件取得（非同期）
         firebaseHelper.getAllMemoList(new FirebaseHelper.MemoListCallback() {
+            // メモ一覧が取得出来たらメモ一覧をListで表示
             @Override
             public void onCallback(ArrayList<Memo> memoList) {
                 // アダプターにメモ一覧を渡す

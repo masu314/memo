@@ -60,8 +60,20 @@ public class CreateActivity extends AppCompatActivity {
         if(inputTitle.isEmpty()){
             Toast.makeText(this, "タイトルが空だと保存できません", Toast.LENGTH_SHORT).show();
         } else {
-            // メモの内容を保存
-            firebaseHelper.insertMemo(inputTitle, inputNote);
+            // データを保存
+            firebaseHelper.insertMemo(inputTitle, inputNote, new FirebaseHelper.ResultCallback() {
+                // 保存に成功した場合
+                @Override
+                public void onSuccess() {
+                    Log.i("CreateActivity", "保存成功");
+                }
+                // 保存に失敗した場合
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(CreateActivity.this, "保存に失敗しました：" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.e("CreateActivity", "保存失敗", e);
+                }
+            });
         }
     }
 

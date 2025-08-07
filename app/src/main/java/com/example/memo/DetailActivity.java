@@ -85,7 +85,19 @@ public class DetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "タイトルが空だと保存できません", Toast.LENGTH_SHORT).show();
             } else {
                 // メモの内容を更新
-                firebaseHelper.updateMemo(id, currentTitle, currentNote);
+                firebaseHelper.updateMemo(id, currentTitle, currentNote, new FirebaseHelper.ResultCallback(){
+                    // 更新に成功した場合
+                    @Override
+                    public void onSuccess() {
+                        Log.i("CreateActivity", "更新成功");
+                    }
+                    // 更新に失敗した場合
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(DetailActivity.this, "更新に失敗しました：" + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.e("DetailActivity", "更新失敗", e);
+                    }
+                });
             }
         // データがない場合
         } else if (id == null){
@@ -105,7 +117,19 @@ public class DetailActivity extends AppCompatActivity {
         // ゴミ箱アイコンを押したときの処理
         } else if (item.getItemId() == R.id.delete_button) {
             // メモを削除
-            firebaseHelper.deleteMemo(id);
+            firebaseHelper.deleteMemo(id, new FirebaseHelper.ResultCallback() {
+                // 削除に成功した場合
+                @Override
+                public void onSuccess() {
+                    Log.i("CreateActivity", "削除成功");
+                }
+                // 削除に失敗した場合
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(DetailActivity.this, "削除に失敗しました：" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.e("DetailActivity", "削除失敗", e);
+                }
+            });
             // メイン画面に遷移
             finish();
             return true;
