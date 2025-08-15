@@ -1,11 +1,10 @@
 <resources>
     <string name="app_name">メモ</string>
-    <string name="add_button_title">Add</string>
-    <string name="delete_button_title">Delete</string>
+    <string name="add_button_title">追加</string>
+    <string name="delete_button_title">削除</string>
+    <string name="select_button_title">選択</string>
+    <string name="menu_button_title">メニュー</string>
+    <string name="cancel_button_title">キャンセル</string>
     <string name="tv_lb_name">タイトル:</string>
     <string name="tv_lb_note">内容:</string>
-    <string name="btn_save">保存</string>
-    <string name="btn_back">戻る</string>
-    <string name="btn_delete">削除</string>
-    <string name="btn_edit">編集</string>
 </resources>

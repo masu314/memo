@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -40,6 +41,10 @@ public class CreateActivity extends AppCompatActivity {
 
         // FirebaseHelperをインスタンス化
         firebaseHelper = new FirebaseHelper();
+
+        // ツールバーをアクションバーとして設定
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // アクションバーを取得
         ActionBar actionBar = getSupportActionBar();

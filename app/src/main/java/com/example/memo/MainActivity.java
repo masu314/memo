@@ -2,6 +2,8 @@ package com.example.memo;
 
 import java.util.ArrayList;
 
+import android.graphics.Color;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -10,13 +12,17 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,13 +31,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
-    private ListView listView;
-    private ListViewAdapter adapter;
+
+    private MemoListAdapter adapter;
     private ArrayList<Memo> memoList;
     private FirebaseHelper firebaseHelper;
     private ValueEventListener serverTimeListener;
     private DatabaseReference offsetRef;
-    private long offset = 0L;
+    private RecyclerView recyclerView;
+    private boolean isSelectionMode = false;
+    private Toolbar toolbar;
+    private MenuItem addItem, selectItem, deleteItem, cancelItem;
+    private TextView cancelTextView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +54,52 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        // FirebaseHelperをインスタンス化
+        // ツールバーを設定
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("メモ");
+        toolbar.inflateMenu(R.menu.main_menu);
+        // ツールバーのキャンセルボタンの取得
+        cancelTextView = findViewById(R.id.select_mode_cancel);
+
+        // メニュークリック処理
+        toolbar.setOnMenuItemClickListener(this::onToolbarMenuItemClick);
+
+        cancelTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exitSelectionMode();
+            }
+        });
+
+        // FirebaseHelper をインスタンス化
         firebaseHelper = new FirebaseHelper();
-        // Firebaseのオフセット参照取得
+        // Firebase のオフセット参照取得
         offsetRef = FirebaseDatabase.getInstance().getReference(".info/serverTimeOffset");
+
+        // RecyclerView の取得
+        recyclerView = findViewById(R.id.memoRecyclerView);
+        // レイアウトマネージャーを設定（縦スクロール）
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // アニメーションを無効化して高さ変動を防ぐ
+        recyclerView.setItemAnimator(null);
+    }
+
+    // 選択モードに入る
+    private void enterSelectionMode() {
+        isSelectionMode = true;
+        toolbar.getMenu().clear();
+        toolbar.setTitle("");
+        toolbar.inflateMenu(R.menu.main_menu_selection);
+        cancelTextView.setVisibility(View.VISIBLE);
+    }
+
+    // 選択モードを終了
+    private void exitSelectionMode() {
+        isSelectionMode = false;
+        toolbar.getMenu().clear();
+        toolbar.setTitle("メモ");
+        toolbar.inflateMenu(R.menu.main_menu);
+        cancelTextView.setVisibility(View.GONE);
     }
 
     @Override
@@ -79,20 +132,13 @@ public class MainActivity extends AppCompatActivity {
     private void loadData() {
         // 登録されているメモ一覧を全件取得（非同期）
         firebaseHelper.getAllMemoList(new FirebaseHelper.MemoListCallback() {
-            // メモ一覧が取得出来たらメモ一覧をListで表示
+            // メモ一覧を表示
             @Override
             public void onCallback(ArrayList<Memo> memoList) {
-                // アダプターにメモ一覧を渡す
-                adapter = new ListViewAdapter(MainActivity.this, memoList);
-                // ListViewにアダプターを設定する
-                listView = (ListView) findViewById(R.id.memoList);
-                listView.setAdapter(adapter);
-
-                // リスト項目がクリックされたときの処理
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                // Adapter を作成し、クリックリスナーを設定
+                adapter = new MemoListAdapter(memoList, new MemoListAdapter.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Memo memo = memoList.get(position);
+                    public void onItemClick(Memo memo, int position) {
                         // 詳細画面に遷移させる準備
                         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
                         // 遷移先にデータを渡す
@@ -103,30 +149,24 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+                // RecyclerView に Adapter を設定
+                recyclerView.setAdapter(adapter);
             }
         });
     }
 
-    // アクションバーにボタンを設定
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //インフレーターを使ってメニューを表示させる
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    // アクションバーのボタンを押したときの処理
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    // ツールバーのメニューを押したときの処理
+    private boolean onToolbarMenuItemClick(MenuItem item) {
         int id = item.getItemId();
-        // +ボタンが押された場合
-        if(id == R.id.add_button){
-            // 登録画面に遷移
-            Intent intent = new Intent(MainActivity.this, CreateActivity.class);
-            startActivity(intent);
+        if (id == R.id.add_button) {
+            startActivity(new Intent(this, CreateActivity.class));
+            return true;
+        } else if (id == R.id.select_button) {
+            enterSelectionMode();
+            return true;
+        } else if (id == R.id.delete_button) {
+            return true;
         }
-        // 他のボタンに対してはデフォルトの処理を実行
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 }

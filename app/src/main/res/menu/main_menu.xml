@@ -2,10 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- アクションボタンを設定 -->
     <item
-        android:id="@+id/add_button"
-        android:icon="@drawable/baseline_add_24"
-        android:title="@string/add_button_title"
-        app:showAsAction="ifRoom"/>
+        android:id="@+id/more_button"
+        android:icon="@drawable/baseline_menu_24"
+        android:title="@string/menu_button_title"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/add_button"
+                android:icon="@drawable/baseline_add_24"
+                android:title="@string/add_button_title" />
+            <item
+                android:id="@+id/select_button"
+                android:icon="@drawable/baseline_check_circle_outline_24"
+                android:title="@string/select_button_title" />
+        </menu>
+    </item>
 </menu>

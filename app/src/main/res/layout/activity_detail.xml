@@ -6,26 +6,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DetailActivity"
-    android:orientation="vertical"
-    android:layout_margin="10sp">
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_common"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/tv_lb_name"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp" />
 
     <EditText
         android:id="@+id/etTitle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="@string/tv_lb_note"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp" />
 
     <EditText
         android:id="@+id/etNote"
@@ -33,5 +40,7 @@
         android:layout_height="386dp"
         android:layout_weight="0.4"
         android:gravity="top"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp" />
 </LinearLayout>
