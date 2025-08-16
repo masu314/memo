@@ -105,7 +105,7 @@ public class FirebaseHelper {
                 });;
     }
 
-    // 全件取得（非同期通信のため、コールバックで結果を返す）
+    // 全件取得（非同期通信のため、コールバックで結果をわたす）
     public void getAllMemoList(MemoListCallback callback) {
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             // Firebaseでデータ取得できた場合の処理
@@ -117,7 +117,7 @@ public class FirebaseHelper {
                     Memo memo = child.getValue(Memo.class);
                     memoList.add(memo);
                 }
-                // 取得したメモをコールバックで返す
+                // callbackを呼び出し、取得したメモをMainActivityに渡す
                 callback.onCallback(memoList);
             }
             // Firebaseでデータ取得に失敗した場合の処理
@@ -125,18 +125,18 @@ public class FirebaseHelper {
             public void onCancelled(@NonNull DatabaseError error) {
                 // ログにエラーメッセージを出力
                 Log.e("FirebaseHelper", "取得失敗: " + error.getMessage());
-                // 空のリストをコールバックで返す
+                // callbackを呼び出し、空のメモをMainActivityに渡す
                 callback.onCallback(new ArrayList<>());
             }
         });
     }
 
-    // メモリストを取得する際のコールバック用インターフェース
+    // メモリストを取得する際のコールバック用インターフェースを定義
     public interface MemoListCallback {
         void onCallback(ArrayList<Memo> memoList);
     }
 
-    // 保存ができたことを確認する際のコールバック用インターフェース
+    // 保存ができたことを確認する際のコールバック用インターフェースを定義
     public interface ResultCallback {
         void onSuccess();
         void onFailure(Exception e);

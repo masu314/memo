@@ -17,14 +17,14 @@ import java.util.Set;
 public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHolder> {
 
     private ArrayList<Memo> memoList;
-    private OnItemClickListener listener;
+    private OnItemClickListener onItemClickListener;
     private boolean isSelectionMode = false;
     private Set<Integer> selectedPositions = new HashSet<>();
 
     // コンストラクタ
-    public MemoListAdapter(ArrayList<Memo> memoList, OnItemClickListener listener) {
+    public MemoListAdapter(ArrayList<Memo> memoList, OnItemClickListener onItemClickListener) {
         this.memoList = memoList;
-        this.listener = listener;
+        this.onItemClickListener = onItemClickListener;
     }
 
     /*
@@ -76,8 +76,14 @@ public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHo
             holder.checkBox.setVisibility(View.GONE);
         }
 
-        // メモリストの項目がクリックされたとき、listenerを通じてMainActivityに通知
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(memo, position));
+        // 通常モードでメモリストの項目がクリックされたとき、listenerを通じてMainActivityに通知
+        holder.itemView.setOnClickListener(v -> {
+            // 通常モードの場合
+            if(!isSelectionMode) {
+                // MainActivityのonItemClick（openDetail)を呼び出す（自作にインターフェースのため手動で呼び出し）
+                onItemClickListener.onItemClick(memo, position);
+            }
+        });
 
         // チェックが変更されたとき、selectedPositionsを更新
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {

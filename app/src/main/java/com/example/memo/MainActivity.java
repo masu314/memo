@@ -100,45 +100,28 @@ public class MainActivity extends AppCompatActivity {
 
     // メモリストの読み込み
     private void loadMemoList() {
-        // 登録されているメモ一覧を全件取得（非同期）
+        // 登録されているメモ一覧を全件取得（コールバックで取得が終わったら結果を受け取り、表示させる）
         firebaseHelper.getAllMemoList(new FirebaseHelper.MemoListCallback() {
             // メモ一覧を表示
             @Override
             public void onCallback(ArrayList<Memo> memoList) {
-                // アダプターを作成し、クリックリスナーを設定
-                adapter = new MemoListAdapter(memoList, new MemoListAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(Memo memo, int position) {
-                        // 詳細画面に遷移させる準備
-                        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                        // 遷移先にデータを渡す
-                        intent.putExtra("memo_id", memo.getId());
-                        intent.putExtra("memo_title", memo.getTitle());
-                        intent.putExtra("memo_note", memo.getNote());
-                        // 詳細画面に遷移
-                        startActivity(intent);
-                    }
-                });
+                // アダプターを作成し、クリックリスナーを登録（onItemClickを呼ぶが実際にはopenDetailが実行されるようにする）
+                adapter = new MemoListAdapter(memoList, MainActivity.this::openDetail);
                 // RecyclerViewにアダプターを設定
                 recyclerView.setAdapter(adapter);
             }
         });
     }
 
-    // メニューの表示を選択モード用にする
-    private void switchToSelectionMenu () {
-        toolbar.getMenu().clear();
-        toolbar.setTitle("");
-        toolbar.inflateMenu(R.menu.main_menu_selection);
-        cancelTextView.setVisibility(View.VISIBLE);
-    }
-
-    // メニューの表示を通常モード用にする
-    private void switchToNormalMenu() {
-        toolbar.getMenu().clear();
-        toolbar.setTitle("メモ");
-        toolbar.inflateMenu(R.menu.main_menu);
-        cancelTextView.setVisibility(View.GONE);
+    // 詳細画面に遷移させる処理（Adapter側でメモリストの項目をクリックした際に呼び出される）
+    private void openDetail(Memo memo, int position) {
+        // 画面遷移の準備
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("memo_id", memo.getId());
+        intent.putExtra("memo_title", memo.getTitle());
+        intent.putExtra("memo_note", memo.getNote());
+        // 詳細画面に遷移
+        startActivity(intent);
     }
 
     // ツールバーのメニューを押したときの処理
@@ -191,5 +174,21 @@ public class MainActivity extends AppCompatActivity {
         switchToNormalMenu();
         // チェックボックスを非表示に変更
         adapter.switchCheckboxes(false);
+    }
+
+    // メニューの表示を選択モード用にする
+    private void switchToSelectionMenu () {
+        toolbar.getMenu().clear();
+        toolbar.setTitle("");
+        toolbar.inflateMenu(R.menu.main_menu_selection);
+        cancelTextView.setVisibility(View.VISIBLE);
+    }
+
+    // メニューの表示を通常モード用にする
+    private void switchToNormalMenu() {
+        toolbar.getMenu().clear();
+        toolbar.setTitle("メモ");
+        toolbar.inflateMenu(R.menu.main_menu);
+        cancelTextView.setVisibility(View.GONE);
     }
 }
