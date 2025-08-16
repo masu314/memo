@@ -9,6 +9,8 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -117,6 +119,9 @@ public class FirebaseHelper {
                     Memo memo = child.getValue(Memo.class);
                     memoList.add(memo);
                 }
+                // 更新日順に並び替える
+                memoList.sort((m1, m2) -> Long.compare(m2.getUpdatedAt(), m1.getUpdatedAt()));;
+
                 // callbackを呼び出し、取得したメモをMainActivityに渡す
                 callback.onCallback(memoList);
             }
