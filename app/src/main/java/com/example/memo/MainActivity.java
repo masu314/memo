@@ -3,12 +3,12 @@ package com.example.memo;
 import java.util.ArrayList;
 
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Toolbar toolbar;
     private TextView cancelTextView;
+    TextView selectedCountView;
 
 
     @Override
@@ -45,16 +46,18 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         // ツールバーを設定
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("メモ");
         toolbar.inflateMenu(R.menu.main_menu);
         // ツールバーのキャンセルボタンの取得
         cancelTextView = findViewById(R.id.select_mode_cancel);
+        // ツールバーの選択中のテキストを取得
+        selectedCountView = findViewById(R.id.toolbar_selected_count);
 
         // ツールバーのメニュー項目クリック処理を実施するため、リスナーインターフェースを登録
         toolbar.setOnMenuItemClickListener(this::onToolbarMenuItemClick);
-
         // ツールバーのキャンセルを押したときの処理を定義するため、リスナーインターフェースを登録
         cancelTextView.setOnClickListener(this::onToolbarCancelClick);
 
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         // アニメーションを無効化して高さ変動を防ぐ
         recyclerView.setItemAnimator(null);
 
-        // 区切り線を追加
+        // リストに区切り線を追加
         DividerItemDecoration divider = new DividerItemDecoration(
                 recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL
@@ -111,10 +114,12 @@ public class MainActivity extends AppCompatActivity {
             // メモ一覧を表示
             @Override
             public void onCallback(ArrayList<Memo> memoList) {
-                // アダプターを作成し、クリックリスナーを登録（onItemClickを呼ぶが実際にはopenDetailが実行されるようにする）
+                // アダプターを作成し、メモリストのクリックリスナーを登録（onItemClickを呼ぶが実際にはopenDetailが実行されるようにする）
                 adapter = new MemoListAdapter(memoList, MainActivity.this::openDetail);
                 // RecyclerViewにアダプターを設定
                 recyclerView.setAdapter(adapter);
+                // アダプターにチェックボックスのリスナーを登録
+                adapter.setOnCheckBoxSelectedListener(MainActivity.this::switchMenuVisibility);
             }
         });
     }
@@ -181,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.switchCheckboxes(false);
     }
 
-    // メニューの表示を選択モード用にする
+    // ツールバーのメニューの表示を選択モード用にする
     private void switchToSelectionMenu () {
         toolbar.getMenu().clear();
         toolbar.setTitle("");
@@ -189,11 +194,28 @@ public class MainActivity extends AppCompatActivity {
         cancelTextView.setVisibility(View.VISIBLE);
     }
 
-    // メニューの表示を通常モード用にする
+    // ツールバーのメニューの表示を通常モード用にする
     private void switchToNormalMenu() {
         toolbar.getMenu().clear();
+        selectedCountView.setText("");
         toolbar.setTitle("メモ");
         toolbar.inflateMenu(R.menu.main_menu);
         cancelTextView.setVisibility(View.GONE);
+    }
+
+    // チェックボックスが選択されているかどうかで、ツールバーのメニューの表示を切り替える
+    private void switchMenuVisibility(int selectedCount) {
+        // 削除メニューを取得
+        Menu menu = toolbar.getMenu();
+        MenuItem deleteItem = menu.findItem(R.id.select_mode_delete);
+        // 選択されている場合
+        if (selectedCount > 0) {
+            selectedCountView.setText(selectedCount + "件選択中");
+            //　削除ボタンを表示
+            deleteItem.setVisible(true);
+        } else {
+            selectedCountView.setText("");
+            deleteItem.setVisible(false);
+        }
     }
 }

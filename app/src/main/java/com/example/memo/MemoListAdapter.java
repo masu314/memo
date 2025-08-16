@@ -17,22 +17,30 @@ import java.util.Set;
 public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHolder> {
 
     private ArrayList<Memo> memoList;
-    private OnItemClickListener onItemClickListener;
+    private OnItemClickListener itemListener;
+    private OnCheckBoxSelectedListener checkBoxListener;
     private boolean isSelectionMode = false;
     private Set<Integer> selectedPositions = new HashSet<>();
 
     // コンストラクタ
-    public MemoListAdapter(ArrayList<Memo> memoList, OnItemClickListener onItemClickListener) {
+    public MemoListAdapter(ArrayList<Memo> memoList, OnItemClickListener itemListener) {
         this.memoList = memoList;
-        this.onItemClickListener = onItemClickListener;
+        this.itemListener = itemListener;
     }
 
-    /*
-     * クリックイベント用インターフェース
-     * MainActivityなど外部からクリックを受け取れるようにする
-     */
+    //　メモがクリックされたときの処理を定義するためのインターフェース
     public interface OnItemClickListener {
         void onItemClick(Memo memo, int position);
+    }
+
+    // チェックボックスがチェックされたときの処理を定義するためのインターフェース
+    public interface OnCheckBoxSelectedListener {
+        void onCheckBoxSelected(int selectedCount);
+    }
+
+    // メインアクティビティでリスナーを登録するためのメソッド
+    public void setOnCheckBoxSelectedListener(OnCheckBoxSelectedListener listener) {
+        this.checkBoxListener = listener;
     }
 
     // ViewHolder の生成
@@ -76,22 +84,30 @@ public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHo
             holder.checkBox.setVisibility(View.GONE);
         }
 
-        // 通常モードでメモリストの項目がクリックされたとき、listenerを通じてMainActivityに通知
+        // 通常モードでメモリストの項目がクリックされたときの処理
         holder.itemView.setOnClickListener(v -> {
             // 通常モードの場合
             if(!isSelectionMode) {
-                // MainActivityのonItemClick（openDetail)を呼び出す（自作にインターフェースのため手動で呼び出し）
-                onItemClickListener.onItemClick(memo, position);
+                 /*
+                  * クリックされたメモの情報とメモの位置をlistenerを通じてMainActivityに通知
+                  *
+                  * MainActivityのonItemClick（openDetail)を呼び出す
+                  * 自作のインターフェースのため手動で呼び出す必要がある
+                  */
+                itemListener.onItemClick(memo, position);
             }
         });
 
-        // チェックが変更されたとき、selectedPositionsを更新
+        // チェックが変更されたときの処理
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // 選択されている項目を更新
             if (isChecked) {
                 selectedPositions.add(position);
             } else {
                 selectedPositions.remove(position);
             }
+            // メインアクティビティにチェックされた数を通知
+            checkBoxListener.onCheckBoxSelected(selectedPositions.size());
         });
     }
 
