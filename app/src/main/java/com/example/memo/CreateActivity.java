@@ -1,6 +1,8 @@
 package com.example.memo;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +25,8 @@ import java.util.Objects;
 public class CreateActivity extends AppCompatActivity {
     private FirebaseHelper firebaseHelper;
     private EditText titleEditView, noteEditView;
+    private String originalTitle,originalNote;
+    private String memoId = null; // 作成後に取得する Firebaseのid
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,28 +61,58 @@ public class CreateActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // 現在フォームに表示されている情報を取得
+
+        // 入力した情報を取得
         String inputTitle = titleEditView.getText().toString();
         String inputNote = noteEditView.getText().toString();
 
-        // タイトルが空の場合
-        if(inputTitle.isEmpty()){
-            Toast.makeText(this, "タイトルが空だと保存できません", Toast.LENGTH_SHORT).show();
-        } else {
-            // データを保存
-            firebaseHelper.insertMemo(inputTitle, inputNote, new FirebaseHelper.ResultCallback() {
-                // 保存に成功した場合
-                @Override
-                public void onSuccess() {
-                    Log.i("CreateActivity", "保存成功");
-                }
-                // 保存に失敗した場合
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(CreateActivity.this, "保存に失敗しました：" + e.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.e("CreateActivity", "保存失敗", e);
-                }
-            });
+        // idが無い場合は新規作成
+        if (memoId == null) {
+            //タイトルと本文が空でない場合
+            if (!(inputTitle.isEmpty() && inputNote.isEmpty())) {
+                // データを保存
+                firebaseHelper.insertMemo(inputTitle, inputNote, new FirebaseHelper.ResultCallbackWithId() {
+                    // 保存に成功した場合
+                    @Override
+                    public void onSuccess(String id) {
+                        Log.i("CreateActivity", "保存成功 " + id);
+                        memoId = id;   // 作成された ID を保持
+                        originalTitle = inputTitle; // 変更前タイトルとして入力内容を設定
+                        originalNote = inputNote; // // 変更前本文として入力内容を設定
+                    }
+
+                    // 保存に失敗した場合
+                    @Override
+                    public void onFailure(String id, Exception e) {
+                        Log.e("CreateActivity", "保存失敗 " + id, e);
+                    }
+                });
+            }else{
+                Log.e("CreateActivity", "タイトルもしくは本文がないため保存できません");
+            }
+        // idがあり、内容が変更されている場合は更新
+        } else if ((!Objects.equals(inputTitle, originalTitle) || !Objects.equals(inputNote, originalNote))){
+            //タイトルと本文が空でない場合
+            if (!(inputTitle.isEmpty() && inputNote.isEmpty())) {
+                // メモの内容を更新
+                firebaseHelper.updateMemo(memoId, inputTitle, inputNote, new FirebaseHelper.ResultCallbackWithId() {
+                    // 更新に成功した場合
+                    @Override
+                    public void onSuccess(String id) {
+                        Log.i("CreateActivity", "更新成功 " + id);
+                        originalTitle = inputTitle;
+                        originalNote = inputNote;
+                    }
+
+                    // 更新に失敗した場合
+                    @Override
+                    public void onFailure(String id, Exception e) {
+                        Log.e("CreateActivity", "更新失敗 " + id, e);
+                    }
+                });
+            } else {
+                Log.e("CreateActivity", "タイトルもしくは本文がないため保存できません");
+            }
         }
     }
 

@@ -24,7 +24,7 @@ import java.util.Objects;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private String id;
+    private String memoId;
     private EditText titleEditView, noteEditView;
     private String originalTitle,originalNote;
     private FirebaseHelper firebaseHelper;
@@ -56,7 +56,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // メイン画面から渡されたIntentからメモの情報を取得
         Intent intent = getIntent();
-        id = intent.getStringExtra("memo_id");
+        memoId = intent.getStringExtra("memo_id");
         originalTitle = intent.getStringExtra("memo_title");
         originalNote = intent.getStringExtra("memo_note");
 
@@ -84,30 +84,31 @@ public class DetailActivity extends AppCompatActivity {
         String currentNote = noteEditView.getText().toString();
 
         // データがあり、内容が変更されている場合
-        if (id != null && (!Objects.equals(currentTitle, originalTitle) || !Objects.equals(currentNote, originalNote))) {
-            // タイトルが空の場合
-            if(currentTitle.isEmpty()){
-                Toast.makeText(this, "タイトルが空だと保存できません", Toast.LENGTH_SHORT).show();
-            } else {
+        if (memoId != null && (!Objects.equals(currentTitle, originalTitle) || !Objects.equals(currentNote, originalNote))) {
+            //タイトルと本文が空でない場合
+            if (!(currentTitle.isEmpty() && currentNote.isEmpty())) {
                 // メモの内容を更新
-                firebaseHelper.updateMemo(id, currentTitle, currentNote, new FirebaseHelper.ResultCallback(){
+                firebaseHelper.updateMemo(memoId, currentTitle, currentNote, new FirebaseHelper.ResultCallbackWithId(){
                     // 更新に成功した場合
                     @Override
-                    public void onSuccess() {
-                        Log.i("CreateActivity", "更新成功");
+                    public void onSuccess(String id) {
+                        Log.i("DetailActivity", "更新成功 " + id);
+                        // 更新内容を反映
+                        originalTitle = currentTitle;
+                        originalNote = currentNote;
                     }
                     // 更新に失敗した場合
                     @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(DetailActivity.this, "更新に失敗しました：" + e.getMessage(), Toast.LENGTH_LONG).show();
-                        Log.e("DetailActivity", "更新失敗", e);
+                    public void onFailure(String id, Exception e) {
+                        Log.e("DetailActivity", "更新失敗 " + id, e);
                     }
                 });
+            } else {
+                Log.e("DetailActivity", "タイトルもしくは本文がないため保存できません");
             }
         // データがない場合
-        } else if (id == null){
+        } else if (memoId == null){
             Log.e("DetailActivity", "メモIDが無効です");
-            Toast.makeText(this, "メモ情報の取得に失敗しました", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -122,17 +123,16 @@ public class DetailActivity extends AppCompatActivity {
         // ゴミ箱アイコンを押したときの処理
         } else if (item.getItemId() == R.id.delete_button) {
             // メモを削除
-            firebaseHelper.deleteMemo(id, new FirebaseHelper.ResultCallback() {
+            firebaseHelper.deleteMemo(memoId, new FirebaseHelper.ResultCallbackWithId() {
                 // 削除に成功した場合
                 @Override
-                public void onSuccess() {
-                    Log.i("DetailActivity", "削除成功");
+                public void onSuccess(String id) {
+                    Log.i("DetailActivity", "削除成功 " + id);
                 }
                 // 削除に失敗した場合
                 @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(DetailActivity.this, "削除に失敗しました：" + e.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.e("DetailActivity", "削除失敗", e);
+                public void onFailure(String id, Exception e) {
+                    Log.e("DetailActivity", "削除失敗 " + id, e);
                 }
             });
             // メイン画面に遷移

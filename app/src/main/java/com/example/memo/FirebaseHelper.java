@@ -25,7 +25,7 @@ public class FirebaseHelper {
     }
 
     // 新規メモの作成（pushでID自動生成）
-    public void insertMemo(String title, String note, ResultCallback callback) {
+    public void insertMemo(String title, String note, ResultCallbackWithId callback) {
         // 新しい一意のキーを生成
         String id = databaseRef.push().getKey();
         // 新規作成内容を取得
@@ -41,7 +41,7 @@ public class FirebaseHelper {
                     @Override
                     public void onSuccess(Void aVoid) {
                         if (callback != null) {
-                            callback.onSuccess();
+                            callback.onSuccess(id);
                     }
                 }
                 // 保存に失敗した場合の処理
@@ -49,14 +49,14 @@ public class FirebaseHelper {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         if (callback != null) {
-                            callback.onFailure(e);
+                            callback.onFailure(id, e);
                         }
                     }
                 });
     }
 
     // メモ更新（ID指定で上書き）
-    public void updateMemo(String id, String newTitle, String newNote, ResultCallback callback) {
+    public void updateMemo(String id, String newTitle, String newNote, ResultCallbackWithId callback) {
         // 指定のidのノードだけ取得
         DatabaseReference memoRef = databaseRef.child(id);
         // 更新内容を取得
@@ -71,7 +71,7 @@ public class FirebaseHelper {
             @Override
             public void onSuccess(Void aVoid) {
                 if (callback != null) {
-                    callback.onSuccess();
+                    callback.onSuccess(id);
                 }
             }
             // 更新に失敗した場合の処理
@@ -79,21 +79,21 @@ public class FirebaseHelper {
             @Override
             public void onFailure(@NonNull Exception e) {
                 if (callback != null) {
-                    callback.onFailure(e);
+                    callback.onFailure(id ,e);
                 }
             }
         });
     }
 
     // メモ削除
-    public void deleteMemo(String id, ResultCallback callback) {
+    public void deleteMemo(String id, ResultCallbackWithId callback) {
         databaseRef.child(id).removeValue()
                 // 削除に成功した場合
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         if (callback != null) {
-                            callback.onSuccess();
+                            callback.onSuccess(id);
                         }
                     }
                 // 削除に失敗した場合の処理
@@ -101,7 +101,7 @@ public class FirebaseHelper {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         if (callback != null) {
-                            callback.onFailure(e);
+                            callback.onFailure(id, e);
                         }
                     }
                 });;
@@ -141,10 +141,10 @@ public class FirebaseHelper {
         void onCallback(ArrayList<Memo> memoList);
     }
 
-    // 保存ができたことを確認する際のコールバック用インターフェースを定義
-    public interface ResultCallback {
-        void onSuccess();
-        void onFailure(Exception e);
+    // DB操作の結果を確認する際のコールバック用インターフェースを定義
+    public interface ResultCallbackWithId {
+        void onSuccess(String id);
+        void onFailure(String id, Exception e);
     }
 
 }

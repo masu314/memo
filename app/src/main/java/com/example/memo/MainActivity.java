@@ -26,13 +26,11 @@ import com.google.firebase.database.ValueEventListener;
 public class MainActivity extends AppCompatActivity {
 
     private MemoListAdapter adapter;
-    private ArrayList<Memo> memoList;
     private FirebaseHelper firebaseHelper;
     private ValueEventListener serverTimeListener;
     private DatabaseReference offsetRef;
     private RecyclerView recyclerView;
     private Toolbar toolbar;
-    private MenuItem addItem, selectItem, deleteItem, cancelItem;
     private TextView cancelTextView;
 
 
@@ -143,17 +141,16 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.select_mode_delete) {
             for(Memo memo : adapter.getSelectedIMemos()){
                 // idに基づきメモを削除
-                firebaseHelper.deleteMemo(memo.getId(), new FirebaseHelper.ResultCallback() {
+                firebaseHelper.deleteMemo(memo.getId(), new FirebaseHelper.ResultCallbackWithId() {
                     // 削除に成功した場合
                     @Override
-                    public void onSuccess() {
-                        Log.i("MainActivity", "削除成功");
+                    public void onSuccess(String id) {
+                        Log.i("MainActivity", "削除成功 " + id);
                     }
                     // 削除に失敗した場合
                     @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(MainActivity.this, "削除に失敗しました：" + e.getMessage(), Toast.LENGTH_LONG).show();
-                        Log.e("MainActivity", "削除失敗", e);
+                    public void onFailure(String id, Exception e) {
+                        Log.e("MainActivity", "削除失敗 " + id, e);
                     }
                 });
             };
