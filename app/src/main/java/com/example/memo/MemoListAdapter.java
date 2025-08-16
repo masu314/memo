@@ -11,11 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHolder> {
 
     private ArrayList<Memo> memoList;
     private OnItemClickListener listener;
+    private boolean isSelectionMode = false;
+    private Set<Integer> selectedPositions = new HashSet<>();
 
     // コンストラクタ
     public MemoListAdapter(ArrayList<Memo> memoList, OnItemClickListener listener) {
@@ -64,8 +68,25 @@ public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHo
             holder.updatedAt.setText("");
         }
 
+        // 選択モードの場合チェックボックスを表示
+        if(isSelectionMode) {
+            holder.checkBox.setVisibility(View.VISIBLE);
+        // 選択モードではない場合チェックボックスを非表示
+        } else {
+            holder.checkBox.setVisibility(View.GONE);
+        }
+
         // メモリストの項目がクリックされたとき、listenerを通じてMainActivityに通知
         holder.itemView.setOnClickListener(v -> listener.onItemClick(memo, position));
+
+        // チェックが変更されたとき、selectedPositionsを更新
+        holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                selectedPositions.add(position);
+            } else {
+                selectedPositions.remove(position);
+            }
+        });
     }
 
     // 表示するアイテム数を取得
@@ -93,5 +114,29 @@ public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHo
             updatedAt = itemView.findViewById(R.id.updatedAt);
             checkBox = itemView.findViewById(R.id.checkBox);
         }
+    }
+
+    // 選択モードON/OFF用（手動切り替え）
+    public void switchCheckboxes(boolean selectionMode) {
+        isSelectionMode = selectionMode;
+        // 選択カウントをリセット
+        selectedPositions.clear();
+        // 画面の再描写
+        notifyDataSetChanged();
+    }
+
+    // 削除後専用（再描画は不要）
+    public void resetSelectedPositionsAfterDelete() {
+        // 選択カウントをリセット
+        selectedPositions.clear();
+    }
+
+    // 選択モードで選択されたメモリストを取得
+    public ArrayList<Memo> getSelectedIMemos() {
+        ArrayList<Memo> selectedMemos = new ArrayList<>();
+        for (int i : selectedPositions) {
+            selectedMemos.add(memoList.get(i));
+        }
+        return selectedMemos;
     }
 }

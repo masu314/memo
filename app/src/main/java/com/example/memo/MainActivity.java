@@ -2,20 +2,15 @@ package com.example.memo;
 
 import java.util.ArrayList;
 
-import android.graphics.Color;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
@@ -24,8 +19,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -38,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private ValueEventListener serverTimeListener;
     private DatabaseReference offsetRef;
     private RecyclerView recyclerView;
-    private boolean isSelectionMode = false;
     private Toolbar toolbar;
     private MenuItem addItem, selectItem, deleteItem, cancelItem;
     private TextView cancelTextView;
@@ -61,15 +53,11 @@ public class MainActivity extends AppCompatActivity {
         // ツールバーのキャンセルボタンの取得
         cancelTextView = findViewById(R.id.select_mode_cancel);
 
-        // メニュークリック処理
+        // ツールバーのメニュー項目クリック処理を実施するため、リスナーインターフェースを登録
         toolbar.setOnMenuItemClickListener(this::onToolbarMenuItemClick);
 
-        cancelTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                exitSelectionMode();
-            }
-        });
+        // ツールバーのキャンセルを押したときの処理を定義するため、リスナーインターフェースを登録
+        cancelTextView.setOnClickListener(this::onToolbarCancelClick);
 
         // FirebaseHelper をインスタンス化
         firebaseHelper = new FirebaseHelper();
@@ -84,24 +72,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(null);
     }
 
-    // 選択モードに入る
-    private void enterSelectionMode() {
-        isSelectionMode = true;
-        toolbar.getMenu().clear();
-        toolbar.setTitle("");
-        toolbar.inflateMenu(R.menu.main_menu_selection);
-        cancelTextView.setVisibility(View.VISIBLE);
-    }
-
-    // 選択モードを終了
-    private void exitSelectionMode() {
-        isSelectionMode = false;
-        toolbar.getMenu().clear();
-        toolbar.setTitle("メモ");
-        toolbar.inflateMenu(R.menu.main_menu);
-        cancelTextView.setVisibility(View.GONE);
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -112,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // データを読み込み
-        loadData();
+        // メモリストを読み込み
+        loadMemoList();
     }
 
     @Override
@@ -128,14 +98,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // データの読み込み
-    private void loadData() {
+    // メモリストの読み込み
+    private void loadMemoList() {
         // 登録されているメモ一覧を全件取得（非同期）
         firebaseHelper.getAllMemoList(new FirebaseHelper.MemoListCallback() {
             // メモ一覧を表示
             @Override
             public void onCallback(ArrayList<Memo> memoList) {
-                // Adapter を作成し、クリックリスナーを設定
+                // アダプターを作成し、クリックリスナーを設定
                 adapter = new MemoListAdapter(memoList, new MemoListAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(Memo memo, int position) {
@@ -149,24 +119,77 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-                // RecyclerView に Adapter を設定
+                // RecyclerViewにアダプターを設定
                 recyclerView.setAdapter(adapter);
             }
         });
     }
 
+    // メニューの表示を選択モード用にする
+    private void switchToSelectionMenu () {
+        toolbar.getMenu().clear();
+        toolbar.setTitle("");
+        toolbar.inflateMenu(R.menu.main_menu_selection);
+        cancelTextView.setVisibility(View.VISIBLE);
+    }
+
+    // メニューの表示を通常モード用にする
+    private void switchToNormalMenu() {
+        toolbar.getMenu().clear();
+        toolbar.setTitle("メモ");
+        toolbar.inflateMenu(R.menu.main_menu);
+        cancelTextView.setVisibility(View.GONE);
+    }
+
     // ツールバーのメニューを押したときの処理
     private boolean onToolbarMenuItemClick(MenuItem item) {
         int id = item.getItemId();
+        // 追加を押した場合
         if (id == R.id.add_button) {
+            // 新規登録画面に遷移
             startActivity(new Intent(this, CreateActivity.class));
             return true;
+        // 選択を押した場合
         } else if (id == R.id.select_button) {
-            enterSelectionMode();
+            // メニュー表示を選択モードに変更
+            switchToSelectionMenu();
+            // チェックボックスを表示に変更
+            adapter.switchCheckboxes(true);
             return true;
-        } else if (id == R.id.delete_button) {
+        // 選択モードの際に表示される削除を押した場合
+        } else if (id == R.id.select_mode_delete) {
+            for(Memo memo : adapter.getSelectedIMemos()){
+                // idに基づきメモを削除
+                firebaseHelper.deleteMemo(memo.getId(), new FirebaseHelper.ResultCallback() {
+                    // 削除に成功した場合
+                    @Override
+                    public void onSuccess() {
+                        Log.i("MainActivity", "削除成功");
+                    }
+                    // 削除に失敗した場合
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(MainActivity.this, "削除に失敗しました：" + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.e("MainActivity", "削除失敗", e);
+                    }
+                });
+            };
+            // メニュー表示を通常モードに変更
+            switchToNormalMenu();
+            // 選択カウントをリセット
+            adapter.resetSelectedPositionsAfterDelete();
+            // データを再度読み込みなおす
+            loadMemoList();
             return true;
         }
         return false;
+    }
+
+    // ツールバーのキャンセルボタンを押したときの処理
+    private void onToolbarCancelClick(View v){
+        // メニュー表示を通常モードに変更
+        switchToNormalMenu();
+        // チェックボックスを非表示に変更
+        adapter.switchCheckboxes(false);
     }
 }

@@ -126,7 +126,7 @@ public class DetailActivity extends AppCompatActivity {
                 // 削除に成功した場合
                 @Override
                 public void onSuccess() {
-                    Log.i("CreateActivity", "削除成功");
+                    Log.i("DetailActivity", "削除成功");
                 }
                 // 削除に失敗した場合
                 @Override
