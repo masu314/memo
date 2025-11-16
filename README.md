@@ -9,29 +9,24 @@ sequenceDiagram
     participant Recycler as RecyclerView
 
     %% --- 画面起動 ---
-    User ->> Main: アプリを起動 / メイン画面を開く
-    Main ->> Main: onCreate() でUI初期化（Toolbar, RecyclerViewなど）
+    User ->> Main: アプリを起動 / メイン画面を開く（onCreate()、onPause()）
 
     %% --- Firebaseからデータ取得 ---
-    Main->>Firebase: getAllMemoList(MemoListCallback)
-    Note right of Main: メモ一覧の取得処理を開始
+    Main->>Firebase: getAllMemoList()でメモ一覧を取得する処理を開始
 
     alt データ取得成功
-        Firebase-->>Main: callback.onCallback(memoList)
-
-        Note right of Main: メモ一覧を返す
-        Main->>Adapter: new MemoListAdapter(memoList, MainActivity.this::openDetail)
-        Main->>Recycler: setAdapter(adapter)
-        Main->>Adapter: setOnCheckBoxSelectedListener(MainActivity.this::switchMenuVisibility)
-        Main -->> User: メモ一覧が表示される
+        Firebase-->>Main: callback.onCallback()でメモ一覧を返す
+        Main->>Adapter: new MemoListAdapter()でリスナーのセットとアダプターを準備
+        Main->>Adapter: setOnCheckBoxSelectedListenerでチェックボックスにリスナーをセット
+        Main->>Recycler: setAdapter()でReceycleViewにアダプターをセット
+        note right of User: メモ一覧が表示される
 
     else データ取得失敗
-        Firebase-->>Main: callback.onCallback(emptyList)
-        Note right of Main: 空のメモ一覧を返す
-        Main->>Adapter: new MemoListAdapter(emptyList, MainActivity.this::openDetail)
-        Main->>Recycler: setAdapter(adapter)
-        Main->>Adapter: setOnCheckBoxSelectedListener(MainActivity.this::switchMenuVisibility)
-        Main -->> User: メモ一覧が表示されない
+        Firebase-->>Main: callback.onCallback()で空のメモ一覧を返す
+        Main->>Adapter: new MemoListAdapter()でアダプターを準備
+        Main->>Adapter: setOnCheckBoxSelectedListenerでチェックボックスにリスナーをセット
+        Main->>Recycler: setAdapter()でReceycleViewにアダプターをセット
+        note right of User: メモ一覧が表示されない
     end
 ```
 
@@ -47,30 +42,29 @@ sequenceDiagram
     participant DB as Firebase Database
 
     %% --- 画面遷移 ---
-    User->>Main: メモをタップ（openDetail(memo)）
-    Main->>Intent: putExtra(memo_id, title, note)
-    Main->>Detail: startActivity(intent)
-    Note right of Detail: onCreate() 呼び出し<br>レイアウト・ツールバー設定<br>Intentからメモ情報取得
-    Detail->>Detail: titleEditView.setText(originalTitle)<br>noteEditView.setText(originalNote)
-    Main -->> User: メモ詳細画面が表示される
+    User->>Main: メモをタップ（openDetail()）
+    Main->>Intent: putExtra(memo_id, title, note)で詳細画面にデータを渡す
+    Main->>Detail: startActivity(intent)で詳細画面を開く
+    Detail->>Intent: intentにアクセスしデータを取得
+    note right of User: 詳細画面が表示される
 
     %% --- 編集して戻る時（onPause） ---
-    User->>Detail: メモの内容を編集
-    Detail->>Detail: onPause() 呼び出し
-    alt 内容が変更されている AND タイトルまたは本文が空でない
-        Detail->>Firebase: updateMemo(memoId, currentTitle, currentNote, callback)
-        Firebase->>DB: データ更新
-        DB-->>Firebase: 更新結果返却
-        Firebase-->>Detail: callback.onSuccess(id)
-        Note right of Detail: originalTitle / originalNote 更新
+    User->>Detail: メモの内容を編集して画面遷移（onPause()）
+    alt 内容が変更されている かつ タイトルまたは本文が空でない
+        Detail->>Firebase: updateMemo()でデータ更新処理を開始
+        Firebase->>DB: データを更新
+        DB-->>Firebase: 結果返却
+        Firebase-->>Detail: callback.onSuccess(id)で更新したデータのidを返す
+        Detail->>Detail: 2重保存されないため、originalTitle = currentTitle で更新データを反映する
     else 内容が空 または 変更なし
         Detail->>Detail: 更新せず終了
     end
 
     %% --- 削除処理 ---
-    User->>Detail: ゴミ箱アイコンをタップ
-    Detail->>Firebase: deleteMemo(memoId, callback)
+    User->>Detail: ゴミ箱アイコンをタップ（onOptionsItemSelected()）
+    Detail->>Firebase: deleteMemo()でメモ削除処理を開始
     Firebase->>DB: データ削除
     DB-->>Firebase: 結果返却
-    Firebase-->>Detail: callback.onSuccess(id)
-    Detail->>Main: finish()（メイン画面に戻る）
+    Firebase-->>Detail: callback.onSuccess(id)で削除したデータのidを返す
+    Detail->>Main: finish()でメイン画面に遷移させる
+    note right of User: メイン画面が表示される
