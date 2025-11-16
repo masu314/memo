@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Toolbar toolbar;
     private TextView cancelTextView;
-    TextView selectedCountView;
+    private TextView selectedCountView;
 
 
     @Override
@@ -116,10 +116,10 @@ public class MainActivity extends AppCompatActivity {
             public void onCallback(ArrayList<Memo> memoList) {
                 // アダプターを作成し、メモリストのクリックリスナーを登録（onItemClickを呼ぶが実際にはopenDetailが実行されるようにする）
                 adapter = new MemoListAdapter(memoList, MainActivity.this::openDetail);
-                // RecyclerViewにアダプターを設定
-                recyclerView.setAdapter(adapter);
                 // アダプターにチェックボックスのリスナーを登録
                 adapter.setOnCheckBoxSelectedListener(MainActivity.this::switchMenuVisibility);
+                // RecyclerViewにアダプターを設定
+                recyclerView.setAdapter(adapter);
             }
         });
     }
@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
             switchToSelectionMenu();
             // チェックボックスを表示に変更
             adapter.switchCheckboxes(true);
+            adapter.notifyDataSetChanged();
             return true;
         // 選択モードの際に表示される削除を押した場合
         } else if (id == R.id.select_mode_delete) {
