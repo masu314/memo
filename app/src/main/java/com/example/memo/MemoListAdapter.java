@@ -79,6 +79,8 @@ public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHo
         // 選択モードの場合チェックボックスを表示
         if(isSelectionMode) {
             holder.checkBox.setVisibility(View.VISIBLE);
+            // 選択状態をリセットする
+            holder.checkBox.setChecked(false);
         // 選択モードではない場合チェックボックスを非表示
         } else {
             holder.checkBox.setVisibility(View.GONE);

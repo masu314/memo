@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
             switchToSelectionMenu();
             // チェックボックスを表示に変更
             adapter.switchCheckboxes(true);
-            adapter.notifyDataSetChanged();
             return true;
         // 選択モードの際に表示される削除を押した場合
         } else if (id == R.id.select_mode_delete) {

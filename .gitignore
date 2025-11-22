@@ -8,9 +8,13 @@ Thumbs.db
 .gradle/
 local.properties
 
+
 # ビルド結果
 /build/
 /app/build/
+/app/build.gradle.kts
+/gradle/libs.versions.toml
+/app/google-services.json
 
 # キャッシュ・ログ
 *.log
@@ -39,3 +43,5 @@ node_modules/
 # IntelliJやJetBrains系エディター関連（補足）
 *.iws
 .idea_modules/
+
+#
