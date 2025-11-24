@@ -1,6 +1,6 @@
 ```mermaid
 sequenceDiagram
-    title メモ一覧画面の表示処理
+    title メイン画面のメモ一覧表示処理
     
     participant User as ユーザー
     participant Main as MainActivity
@@ -8,59 +8,58 @@ sequenceDiagram
     participant Adapter as MemoListAdapter
     participant Recycler as RecyclerView
 
-    %% --- 画面起動 ---
-    User ->> Main: アプリを起動 / メイン画面を開く（onCreate()、onPause()）
-
-    %% --- Firebaseからデータ取得 ---
+    User ->> Main: アプリを起動 / メイン画面を開く（loadMemoList()）
     Main->>Firebase: getAllMemoList()でメモ一覧を取得する処理を開始
 
-    alt データ取得成功
-        Firebase-->>Main: callback.onCallback()でメモ一覧を返す
-        Main->>Adapter: new MemoListAdapter()でリスナーのセットとアダプターを準備
-        Main->>Adapter: setOnCheckBoxSelectedListenerでチェックボックスにリスナーをセット
-        Main->>Recycler: setAdapter()でReceycleViewにアダプターをセット
-        note right of User: メモ一覧が表示される
+    Firebase-->>Main: callback.onCallback()でメモ一覧を返す
+    Main->>Adapter: new MemoListAdapter()で詳細画面遷移用のリスナーをセットし、アダプターを準備
+    Main->>Adapter: setOnCheckBoxSelectedListenerでチェックボックスにリスナーをセット
+    Main->>Recycler: setAdapter()でReceycleViewに準備したアダプターをセット
+    note right of User: メモ一覧が表示される
+```
 
-    else データ取得失敗
-        Firebase-->>Main: callback.onCallback()で空のメモ一覧を返す
-        Main->>Adapter: new MemoListAdapter()でアダプターを準備
-        Main->>Adapter: setOnCheckBoxSelectedListenerでチェックボックスにリスナーをセット
-        Main->>Recycler: setAdapter()でReceycleViewにアダプターをセット
-        note right of User: メモ一覧が表示されない
+```mermaid
+sequenceDiagram
+    title メモ一覧画面からメモ詳細画面に遷移する処理
+    participant User as ユーザー
+    participant Main as MainActivity
+    participant Detail as DetailActivity
+
+    User->>Main: メモをタップ（openDetail()）
+    Main->>Detail: putExtra(memo_id, title, note)でintentにデータを渡し、startActivity(intent)で詳細画面を開く
+    note right of User: 詳細画面が表示される
+```
+
+```mermaid
+sequenceDiagram
+    title メモ詳細画面での編集処理
+    participant User as ユーザー
+    participant Main as MainActivity
+    participant Detail as DetailActivity
+    participant Firebase as FirebaseHelper
+    participant DB as Firebase Database
+
+    User->>Detail: メモの内容を編集して画面遷移（onPause()）
+    alt idが取得できて内容が変更されている かつ タイトルまたは本文が空でない
+        Detail->>Firebase: updateMemo()でデータ更新処理を開始
+        Firebase->>DB: データを更新
+        DB-->>Firebase: 結果返却
+        Firebase-->>Detail: callback.onSuccess(id)で更新したデータのidを返す
+        Detail->>Detail: 2重更新しないために、originalTitle = currentTitle で更新データを反映する
+    else それ以外の場合
+        Detail->>Detail: 更新せず終了
     end
 ```
 
 ```mermaid
 sequenceDiagram
-    title メモ詳細画面遷移と処理の流れ
-
+    title メモ詳細画面での削除処理
     participant User as ユーザー
     participant Main as MainActivity
-    participant Intent as Intent
     participant Detail as DetailActivity
     participant Firebase as FirebaseHelper
     participant DB as Firebase Database
 
-    %% --- 画面遷移 ---
-    User->>Main: メモをタップ（openDetail()）
-    Main->>Intent: putExtra(memo_id, title, note)で詳細画面にデータを渡す
-    Main->>Detail: startActivity(intent)で詳細画面を開く
-    Detail->>Intent: intentにアクセスしデータを取得
-    note right of User: 詳細画面が表示される
-
-    %% --- 編集して戻る時（onPause） ---
-    User->>Detail: メモの内容を編集して画面遷移（onPause()）
-    alt 内容が変更されている かつ タイトルまたは本文が空でない
-        Detail->>Firebase: updateMemo()でデータ更新処理を開始
-        Firebase->>DB: データを更新
-        DB-->>Firebase: 結果返却
-        Firebase-->>Detail: callback.onSuccess(id)で更新したデータのidを返す
-        Detail->>Detail: 2重保存されないため、originalTitle = currentTitle で更新データを反映する
-    else 内容が空 または 変更なし
-        Detail->>Detail: 更新せず終了
-    end
-
-    %% --- 削除処理 ---
     User->>Detail: ゴミ箱アイコンをタップ（onOptionsItemSelected()）
     Detail->>Firebase: deleteMemo()でメモ削除処理を開始
     Firebase->>DB: データ削除
@@ -68,3 +67,34 @@ sequenceDiagram
     Firebase-->>Detail: callback.onSuccess(id)で削除したデータのidを返す
     Detail->>Main: finish()でメイン画面に遷移させる
     note right of User: メイン画面が表示される
+```
+
+```mermaid
+sequenceDiagram
+    title メモ新規作成画面での新規作成処理
+    participant User as ユーザー
+    participant Main as MainActivity
+    participant C as CreateActivity
+    participant Firebase as FirebaseHelper
+    participant DB as Firebase Database
+
+    User->>Main: 3点リーダーから「追加」をタップ
+    Main->>C: startActivity(intent)で新規作成画面を開く
+    note right of User: 新規作成画面が表示される
+    User->>C: タイトルと内容を入力して画面遷移（onPause()）
+    alt idが既に登録されていない場合 かつ タイトルと本文が空でない場合
+        C->>Firebase: insertMemo()でデータ登録処理を開始
+        Firebase->>DB: データを登録
+        DB-->>Firebase: 結果返却
+        Firebase-->>C: callback.onSuccess(id)で登録したデータのidを返す
+        C->>C: 2重登録しないために、memoId = id ,originalTitle = inputTitle で登録データを反映する
+    else idが既に登録されていて内容が変更されている場合 かつタイトルと本文が空でない場合
+        C->>Firebase: updateMemo()でデータ更新処理を開始
+        Firebase->>DB: データを更新
+        DB-->>Firebase: 結果返却
+        Firebase-->>C: callback.onSuccess(id)で更新したデータのidを返す
+        C->>C: 2重更新しないために、originalTitle = inputTitle で更新データを反映する
+    else それ以外の場合
+        C->>C: 登録せず終了
+    end
+```
