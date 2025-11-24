@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
         // 選択されている場合
         if (selectedCount > 0) {
             selectedCountView.setText(selectedCount + "件選択中");
-            //　削除ボタンを表示
+            //　ゴミ箱アイコンを表示
             deleteItem.setVisible(true);
         } else {
             selectedCountView.setText("");
