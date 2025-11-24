@@ -19,7 +19,7 @@ public class CreateActivity extends AppCompatActivity {
     private FirebaseHelper firebaseHelper;
     private EditText titleEditView, noteEditView;
     private String originalTitle,originalNote;
-    private String memoId = null; // 作成後に取得する Firebaseのid
+    private String memoId = null; // 作成後に取得する Firebase　のid
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +59,10 @@ public class CreateActivity extends AppCompatActivity {
         String inputTitle = titleEditView.getText().toString();
         String inputNote = noteEditView.getText().toString();
 
-        // idが無い場合は新規作成
-        if (memoId == null) {
-            //タイトルと本文が空でない場合
-            if (!(inputTitle.isEmpty() && inputNote.isEmpty())) {
+        //タイトルと本文が空でない場合
+        if (!(inputTitle.isEmpty() && inputNote.isEmpty())) {
+            // idが無い場合は新規作成
+            if (memoId == null) {
                 // データを保存
                 firebaseHelper.insertMemo(inputTitle, inputNote, new FirebaseHelper.ResultCallbackWithId() {
                     // 保存に成功した場合
@@ -80,13 +80,8 @@ public class CreateActivity extends AppCompatActivity {
                         Log.e("CreateActivity", "保存失敗 " + id, e);
                     }
                 });
-            }else{
-                Log.e("CreateActivity", "タイトルもしくは本文がないため保存できません");
-            }
-        // idがあり、内容が変更されている場合は更新
-        } else if ((!Objects.equals(inputTitle, originalTitle) || !Objects.equals(inputNote, originalNote))){
-            //タイトルと本文が空でない場合
-            if (!(inputTitle.isEmpty() && inputNote.isEmpty())) {
+            // idがあり、内容が変更されている場合は更新
+            } else if (!Objects.equals(inputTitle, originalTitle) || !Objects.equals(inputNote, originalNote)){
                 // メモの内容を更新
                 firebaseHelper.updateMemo(memoId, inputTitle, inputNote, new FirebaseHelper.ResultCallbackWithId() {
                     // 更新に成功した場合
@@ -103,9 +98,9 @@ public class CreateActivity extends AppCompatActivity {
                         Log.e("CreateActivity", "更新失敗 " + id, e);
                     }
                 });
-            } else {
-                Log.e("CreateActivity", "タイトルもしくは本文がないため保存できません");
             }
+        } else {
+            Log.e("CreateActivity", "タイトルと本文がないため保存できません");
         }
     }
 

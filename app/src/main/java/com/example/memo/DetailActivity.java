@@ -78,12 +78,12 @@ public class DetailActivity extends AppCompatActivity {
         String currentTitle = titleEditView.getText().toString();
         String currentNote = noteEditView.getText().toString();
 
-        // データがあり、内容が変更されている場合
-        if (memoId != null && (!Objects.equals(currentTitle, originalTitle) || !Objects.equals(currentNote, originalNote))) {
-            //タイトルと本文が空でない場合
-            if (!(currentTitle.isEmpty() && currentNote.isEmpty())) {
+        //タイトルと本文が空でない場合
+        if (!(currentTitle.isEmpty() && currentNote.isEmpty())) {
+            // データがあり、内容が変更されている場合
+            if (memoId != null && (!Objects.equals(currentTitle, originalTitle) || !Objects.equals(currentNote, originalNote))) {
                 // メモの内容を更新
-                firebaseHelper.updateMemo(memoId, currentTitle, currentNote, new FirebaseHelper.ResultCallbackWithId(){
+                firebaseHelper.updateMemo(memoId, currentTitle, currentNote, new FirebaseHelper.ResultCallbackWithId() {
                     // 更新に成功した場合
                     @Override
                     public void onSuccess(String id) {
@@ -92,18 +92,16 @@ public class DetailActivity extends AppCompatActivity {
                         originalTitle = currentTitle;
                         originalNote = currentNote;
                     }
+
                     // 更新に失敗した場合
                     @Override
                     public void onFailure(String id, Exception e) {
                         Log.e("DetailActivity", "更新失敗 " + id, e);
                     }
                 });
-            } else {
-                Log.e("DetailActivity", "タイトルもしくは本文がないため保存できません");
             }
-        // データがない場合
-        } else if (memoId == null){
-            Log.e("DetailActivity", "メモIDが無効です");
+        } else {
+            Log.e("DetailActivity", "タイトルと本文がないため保存できません");
         }
     }
 
