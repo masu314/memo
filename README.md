@@ -19,7 +19,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    title メモ一覧画面からメモ詳細画面に遷移する処理
+    title メイン画面からメモ詳細画面に遷移する処理
     participant User as ユーザー
     participant Main as MainActivity
     participant Detail as DetailActivity
@@ -33,7 +33,6 @@ sequenceDiagram
 sequenceDiagram
     title メモ詳細画面での編集処理
     participant User as ユーザー
-    participant Main as MainActivity
     participant Detail as DetailActivity
     participant Firebase as FirebaseHelper
     participant DB as Firebase Database
@@ -70,16 +69,24 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    title メモ新規作成画面での新規作成処理
+    title メイン画面からメモ新規作成画面に遷移する処理
     participant User as ユーザー
     participant Main as MainActivity
     participant C as CreateActivity
-    participant Firebase as FirebaseHelper
-    participant DB as Firebase Database
 
     User->>Main: 3点リーダーから「追加」をタップ（onToolbarMenuItemClick()）
     Main->>C: startActivity(intent)で新規作成画面を開く
     note right of User: 新規作成画面が表示される
+```
+
+```mermaid
+sequenceDiagram
+    title メモ新規作成画面での新規作成処理
+    participant User as ユーザー
+    participant C as CreateActivity
+    participant Firebase as FirebaseHelper
+    participant DB as Firebase Database
+
     User->>C: タイトルと内容を入力して画面遷移（onPause()）
     alt idが既に登録されていない場合 かつ タイトルと本文が空でない場合
         C->>Firebase: insertMemo()でデータ登録処理を開始
@@ -100,7 +107,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    title メモ一覧画面での複数削除処理
+    title メイン画面での複数削除処理
     participant User as ユーザー
     participant Main as MainActivity
     participant Adapter as MemoListAdapter
