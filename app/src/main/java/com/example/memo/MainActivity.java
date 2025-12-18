@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 // アダプターを作成し、メモリストのクリックリスナーを登録（onItemClickを呼ぶが実際にはopenDetailが実行されるようにする）
                 adapter = new MemoListAdapter(memoList, MainActivity.this::openDetail);
                 // アダプターにチェックボックスのリスナーを登録
-                adapter.setOnCheckBoxSelectedListener(MainActivity.this::switchMenuVisibility);
+                adapter.setOnCheckBoxSelectedListener(MainActivity.this::updateSelectionMenu);
                 // RecyclerViewにアダプターを設定
                 recyclerView.setAdapter(adapter);
             }
@@ -148,11 +148,12 @@ public class MainActivity extends AppCompatActivity {
             // メニュー表示を選択モードに変更
             switchToSelectionMenu();
             // チェックボックスを表示に変更
-            adapter.switchCheckboxes(true);
+            adapter.enableCheckboxSelection();
             return true;
         // 選択モードの際にゴミ箱アイコンを押した場合
         } else if (id == R.id.select_mode_delete) {
-            for(Memo memo : adapter.getSelectedIMemos()){
+            // 選択した項目分繰り返す
+            for(Memo memo : adapter.getSelectedMemoList()){
                 // idに基づきメモを削除
                 firebaseHelper.deleteMemo(memo.getId(), new FirebaseHelper.ResultCallbackWithId() {
                     // 削除に成功した場合
@@ -170,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             // メニュー表示を通常モードに変更
             switchToNormalMenu();
             // 選択カウントをリセット
-            adapter.resetSelectedPositionsAfterDelete();
+            adapter.clearCheckedItems();
             // データを再度読み込みなおす
             loadMemoList();
             return true;
@@ -182,8 +183,10 @@ public class MainActivity extends AppCompatActivity {
     private void onToolbarCancelClick(View v){
         // メニュー表示を通常モードに変更
         switchToNormalMenu();
+        // 選択カウントをリセット
+        adapter.clearCheckedItems();
         // チェックボックスを非表示に変更
-        adapter.switchCheckboxes(false);
+        adapter.disableCheckboxSelection();
     }
 
     // ツールバーのメニューの表示を選択モード用にする
@@ -203,13 +206,14 @@ public class MainActivity extends AppCompatActivity {
         cancelTextView.setVisibility(View.GONE);
     }
 
-    // チェックボックスが選択されているかどうかで、ツールバーのメニューの表示を切り替える
-    private void switchMenuVisibility(int selectedCount) {
-        // 削除メニューを取得
+    // チェックボックスが選択されたら、選択モードのメニューの表示を変更する
+    private void updateSelectionMenu(int selectedCount) {
+        // ゴミ箱アイコンを取得
         Menu menu = toolbar.getMenu();
         MenuItem deleteItem = menu.findItem(R.id.select_mode_delete);
         // 選択されている場合
         if (selectedCount > 0) {
+            // 選択した件数を表示
             selectedCountView.setText(selectedCount + "件選択中");
             //　ゴミ箱アイコンを表示
             deleteItem.setVisible(true);

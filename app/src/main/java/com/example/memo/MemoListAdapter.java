@@ -140,27 +140,30 @@ public class MemoListAdapter extends RecyclerView.Adapter<MemoListAdapter.ViewHo
         }
     }
 
-    // 選択モードON/OFF用（手動切り替え）
-    public void switchCheckboxes(boolean selectionMode) {
-        isSelectionMode = selectionMode;
-        // 選択カウントをリセット
-        selectedPositions.clear();
-        // 画面の再描写
+
+    // チェックボックスを表示
+    public void enableCheckboxSelection() {
+        isSelectionMode = true;
         notifyDataSetChanged();
     }
 
-    // 削除後専用（再描画は不要）
-    public void resetSelectedPositionsAfterDelete() {
-        // 選択カウントをリセット
+    // チェックボックスを非表示
+    public void disableCheckboxSelection() {
+        isSelectionMode = false;
+        notifyDataSetChanged();
+    }
+
+    // チェックボックスのカウントをリセット
+    public void clearCheckedItems() {
         selectedPositions.clear();
     }
 
     // 選択モードで選択されたメモリストを取得
-    public ArrayList<Memo> getSelectedIMemos() {
-        ArrayList<Memo> selectedMemos = new ArrayList<>();
+    public ArrayList<Memo> getSelectedMemoList() {
+        ArrayList<Memo> selectedMemoList = new ArrayList<>();
         for (int i : selectedPositions) {
-            selectedMemos.add(memoList.get(i));
+            selectedMemoList.add(memoList.get(i));
         }
-        return selectedMemos;
+        return selectedMemoList;
     }
 }
