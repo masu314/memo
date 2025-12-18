@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             // チェックボックスを表示に変更
             adapter.switchCheckboxes(true);
             return true;
-        // 選択モードの際に表示される削除を押した場合
+        // 選択モードの際にゴミ箱アイコンを押した場合
         } else if (id == R.id.select_mode_delete) {
             for(Memo memo : adapter.getSelectedIMemos()){
                 // idに基づきメモを削除
