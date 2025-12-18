@@ -66,7 +66,7 @@ sequenceDiagram
     DB-->>Firebase: 結果返却
     Firebase-->>Detail: callback.onSuccess(id)で削除したデータのidを返す
     Detail->>Main: finish()でメイン画面に遷移させる
-    note right of User: メイン画面が表示される
+    note right of User: メモが削除された状態でメイン画面が表示される
 ```
 
 ```mermaid
@@ -78,7 +78,7 @@ sequenceDiagram
     participant Firebase as FirebaseHelper
     participant DB as Firebase Database
 
-    User->>Main: 3点リーダーから「追加」をタップ
+    User->>Main: 3点リーダーから「追加」をタップ（onToolbarMenuItemClick()）
     Main->>C: startActivity(intent)で新規作成画面を開く
     note right of User: 新規作成画面が表示される
     User->>C: タイトルと内容を入力して画面遷移（onPause()）
@@ -97,4 +97,29 @@ sequenceDiagram
     else それ以外の場合
         C->>C: 登録せず終了
     end
+```
+
+```mermaid
+sequenceDiagram
+    title メモ一覧画面での複数削除処理
+    participant User as ユーザー
+    participant Main as MainActivity
+    participant Firebase as FirebaseHelper
+    participant DB as Firebase Database
+
+    User->>Main: 3点リーダーから「選択」をタップ（onToolbarMenuItemClick()）
+    Main->>Main: switchToSelectionMenu()でメニュー表示を選択モードに変更
+    Main->>Main: adapter.switchCheckboxes(true)で画面にチェックボックスを表示
+    User->>Main: チェックボックスにチェックを入れる
+    Main->>Main: switchMenuVisibility()で選択した件数をカウントし表示
+    Main->>Main: deleteItem.setVisible(true)でゴミ箱アイコンを表示
+    User->>Main: ゴミ箱アイコンをタップする
+    Main->>Firebase: deleteMemo()でメモ削除処理を開始<br/>（for文でチェックされた項目数分繰り返す）
+    Firebase->>DB: データ削除
+    DB-->>Firebase: 結果返却
+    Firebase-->>Main: callback.onSuccess(id)で削除したデータのidを返す
+    Main->>Main: switchToNormalMenu()でメニューを通常モードに変更
+    Main->>Main: resetSelectedPositionsAfterDelete()で選択カウントをリセット
+    Main->>Main: loadnMemoList()でデータを再度読み込みなおす
+    note right of User: メモが削除された状態でメイン画面が表示される
 ```
